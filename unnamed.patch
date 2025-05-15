@@ -1,0 +1,311 @@
+Index: app/src/main/java/com/example/fedger/ui/screens/AddTransactionScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/fedger/ui/screens/AddTransactionScreen.kt b/app/src/main/java/com/example/fedger/ui/screens/AddTransactionScreen.kt
+--- a/app/src/main/java/com/example/fedger/ui/screens/AddTransactionScreen.kt	
++++ b/app/src/main/java/com/example/fedger/ui/screens/AddTransactionScreen.kt	(date 1747294709756)
+@@ -279,29 +279,23 @@
+                             Box(
+                                 modifier = Modifier
+                                     .fillMaxWidth()
+-                                    .padding(top = 4.dp, bottom = 8.dp)
++                                    .padding(top = 4.dp, bottom = 4.dp)
+                             ) {
+                                 OutlinedTextField(
+                                     value = selectedContact?.name ?: "",
+                                     onValueChange = { /* Read only */ },
+-                                    placeholder = { 
+-                                        Text(
+-                                            "Select a contact", 
+-                                            color = TextGrey,
+-                                            style = MaterialTheme.typography.bodyLarge
+-                                        )
+-                                    },
++                                    placeholder = { Text("Select a contact", color = TextGrey) },
+                                     colors = OutlinedTextFieldDefaults.colors(
+                                         focusedBorderColor = MediumPurple,
+-                                        unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
++                                        unfocusedBorderColor = LightPurple.copy(alpha = 0.3f),
+                                         focusedTextColor = TextWhite,
+                                         unfocusedTextColor = TextWhite,
+                                         cursorColor = MediumPurple,
+-                                        focusedContainerColor = CardBackground.copy(alpha = 0.3f),
+-                                        unfocusedContainerColor = CardBackground.copy(alpha = 0.2f),
++                                        focusedContainerColor = CardBackground.copy(alpha = 0.2f),
++                                        unfocusedContainerColor = CardBackground.copy(alpha = 0.1f),
+                                         disabledTextColor = TextWhite,
+-                                        disabledBorderColor = LightPurple.copy(alpha = 0.5f),
+-                                        disabledContainerColor = CardBackground.copy(alpha = 0.3f)
++                                        disabledBorderColor = LightPurple.copy(alpha = 0.3f),
++                                        disabledContainerColor = CardBackground.copy(alpha = 0.2f)
+                                     ),
+                                     modifier = Modifier
+                                         .fillMaxWidth()
+@@ -311,32 +305,6 @@
+                                             role = Role.DropdownList
+                                         },
+                                     readOnly = true,
+-                                    leadingIcon = if (selectedContact != null) {
+-                                        {
+-                                            // Avatar circle for selected contact
+-                                            Box(
+-                                                modifier = Modifier
+-                                                    .size(32.dp)
+-                                                    .clip(CircleShape)
+-                                                    .background(
+-                                                        brush = Brush.radialGradient(
+-                                                            colors = listOf(
+-                                                                LightPurple.copy(alpha = 0.7f),
+-                                                                MediumPurple.copy(alpha = 0.5f)
+-                                                            )
+-                                                        )
+-                                                    ),
+-                                                contentAlignment = Alignment.Center
+-                                            ) {
+-                                                Text(
+-                                                    text = selectedContact.name.firstOrNull()?.uppercase() ?: "?",
+-                                                    style = MaterialTheme.typography.bodyLarge,
+-                                                    fontWeight = FontWeight.SemiBold,
+-                                                    color = TextWhite
+-                                                )
+-                                            }
+-                                        }
+-                                    } else null,
+                                     trailingIcon = {
+                                         IconButton(onClick = { expanded = true }) {
+                                             Icon(
+@@ -346,9 +314,6 @@
+                                             )
+                                         }
+                                     },
+-                                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+-                                        fontWeight = FontWeight.Medium
+-                                    ),
+                                     isError = contactError != null,
+                                     supportingText = {
+                                         if (contactError != null) {
+@@ -368,6 +333,122 @@
+                                     shape = MaterialTheme.shapes.medium,
+                                     enabled = false
+                                 )
++                                
++                                // Improved dropdown menu with better styling
++                                DropdownMenu(
++                                    expanded = expanded,
++                                    onDismissRequest = { expanded = false },
++                                    modifier = Modifier
++                                        .fillMaxWidth(0.9f)
++                                        .background(SurfaceLight)
++                                        .height(350.dp)
++                                ) {
++                                    // Search bar at top of dropdown
++                                    var contactSearchQuery by remember { mutableStateOf("") }
++                                    
++                                    OutlinedTextField(
++                                        value = contactSearchQuery,
++                                        onValueChange = { contactSearchQuery = it },
++                                        placeholder = { Text("Search contacts", color = TextGrey) },
++                                        colors = OutlinedTextFieldDefaults.colors(
++                                            focusedBorderColor = MediumPurple,
++                                            unfocusedBorderColor = LightPurple.copy(alpha = 0.3f),
++                                            focusedTextColor = TextWhite,
++                                            unfocusedTextColor = TextWhite,
++                                            cursorColor = MediumPurple,
++                                            focusedContainerColor = CardBackground.copy(alpha = 0.2f),
++                                            unfocusedContainerColor = CardBackground.copy(alpha = 0.1f)
++                                        ),
++                                        leadingIcon = {
++                                            Icon(
++                                                imageVector = Icons.Default.Search,
++                                                contentDescription = "Search contacts",
++                                                tint = LightPurple
++                                            )
++                                        },
++                                        modifier = Modifier
++                                            .fillMaxWidth()
++                                            .padding(horizontal = 16.dp, vertical = 8.dp),
++                                        singleLine = true,
++                                        shape = MaterialTheme.shapes.small
++                                    )
++                                    
++                                    // Add separator
++                                    Divider(
++                                        color = LightPurple.copy(alpha = 0.3f),
++                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
++                                    )
++                                    
++                                    // Filter contacts by search query
++                                    val filteredContacts = allContacts.filter { person -> 
++                                        person.name.contains(contactSearchQuery, ignoreCase = true) || 
++                                        person.phoneNumber.contains(contactSearchQuery, ignoreCase = true)
++                                    }
++                                    
++                                    if (filteredContacts.isEmpty()) {
++                                        Text(
++                                            text = "No contacts found",
++                                            color = TextGrey,
++                                            modifier = Modifier
++                                                .fillMaxWidth()
++                                                .padding(16.dp),
++                                            textAlign = TextAlign.Center
++                                        )
++                                    } else {
++                                        filteredContacts.forEach { person ->
++                                            DropdownMenuItem(
++                                                text = {
++                                                    Column {
++                                                        Text(
++                                                            text = person.name,
++                                                            style = MaterialTheme.typography.bodyLarge,
++                                                            fontWeight = if (selectedPersonId == person.id) FontWeight.Bold else FontWeight.Normal
++                                                        )
++                                                        if (person.phoneNumber.isNotEmpty()) {
++                                                            Text(
++                                                                text = person.phoneNumber,
++                                                                style = MaterialTheme.typography.bodySmall,
++                                                                color = TextGrey
++                                                            )
++                                                        }
++                                                    }
++                                                },
++                                                onClick = {
++                                                    selectedPersonId = person.id
++                                                    contactError = null
++                                                    expanded = false
++                                                },
++                                                leadingIcon = {
++                                                    // Show an avatar/icon
++                                                    Box(
++                                                        modifier = Modifier
++                                                            .size(32.dp)
++                                                            .clip(CircleShape)
++                                                            .background(MediumPurple.copy(alpha = 0.2f)),
++                                                        contentAlignment = Alignment.Center
++                                                    ) {
++                                                        Text(
++                                                            text = person.name.firstOrNull()?.toString() ?: "?",
++                                                            color = TextWhite
++                                                        )
++                                                    }
++                                                },
++                                                trailingIcon = if (selectedPersonId == person.id) {
++                                                    {
++                                                        Icon(
++                                                            imageVector = Icons.Default.Check,
++                                                            contentDescription = "Selected",
++                                                            tint = MediumPurple
++                                                        )
++                                                    }
++                                                } else null,
++                                                modifier = Modifier.background(
++                                                    if (selectedPersonId == person.id) MediumPurple.copy(alpha = 0.1f) else Color.Transparent
++                                                )
++                                            )
++                                        }
++                                    }
++                                }
+                             }
+                         }
+                         
+@@ -573,13 +654,13 @@
+                         
+                         // Double-check that we have a valid personId
+                         personId?.let { id ->
+-                            val transaction = Transaction(
++                        val transaction = Transaction(
+                                 personId = id,
+-                                amount = amount.toDouble(),
+-                                description = description,
++                            amount = amount.toDouble(),
++                            description = description,
+                                 isCredit = transactionType == "sent" // true for "To Receive", false for "To Pay"
+-                            )
+-                            onTransactionAdded(transaction)
++                        )
++                        onTransactionAdded(transaction)
+                         } ?: run {
+                             // This shouldn't happen due to validation, but just in case
+                             if (isGlobalMode) {
+@@ -614,80 +695,3 @@
+         }
+     }
+ }
+-
+-// Contact item composable for the dropdown
+-@Composable
+-private fun ContactItem(
+-    person: Person,
+-    isSelected: Boolean,
+-    onClick: () -> Unit
+-) {
+-    Row(
+-        modifier = Modifier
+-            .fillMaxWidth()
+-            .clickable(onClick = onClick)
+-            .background(
+-                if (isSelected) MediumPurple.copy(alpha = 0.2f) else Color.Transparent,
+-                shape = MaterialTheme.shapes.small
+-            )
+-            .padding(12.dp),
+-        verticalAlignment = Alignment.CenterVertically
+-    ) {
+-        // Avatar circle
+-        Box(
+-            modifier = Modifier
+-                .size(40.dp)
+-                .shadow(2.dp, CircleShape)
+-                .clip(CircleShape)
+-                .background(
+-                    brush = Brush.radialGradient(
+-                        colors = listOf(
+-                            LightPurple.copy(alpha = 0.7f),
+-                            MediumPurple.copy(alpha = 0.5f)
+-                        )
+-                    )
+-                ),
+-            contentAlignment = Alignment.Center
+-        ) {
+-            Text(
+-                text = person.name.firstOrNull()?.uppercase() ?: "?",
+-                style = MaterialTheme.typography.titleMedium,
+-                fontWeight = FontWeight.SemiBold,
+-                color = TextWhite
+-            )
+-        }
+-        
+-        Spacer(modifier = Modifier.width(12.dp))
+-        
+-        // Contact info
+-        Column(
+-            modifier = Modifier.weight(1f)
+-        ) {
+-            Text(
+-                text = person.name,
+-                style = MaterialTheme.typography.bodyLarge,
+-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+-                color = TextWhite
+-            )
+-            
+-            if (person.phoneNumber.isNotEmpty()) {
+-                Spacer(modifier = Modifier.height(2.dp))
+-                Text(
+-                    text = person.phoneNumber,
+-                    style = MaterialTheme.typography.bodySmall,
+-                    color = TextGrey
+-                )
+-            }
+-        }
+-        
+-        // Check icon for selected item
+-        if (isSelected) {
+-            Icon(
+-                imageVector = Icons.Default.Check,
+-                contentDescription = "Selected",
+-                tint = MediumPurple,
+-                modifier = Modifier.size(24.dp)
+-            )
+-        }
+-    }
+-}

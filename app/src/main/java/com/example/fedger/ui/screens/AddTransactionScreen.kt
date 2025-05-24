@@ -7,6 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -20,6 +22,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +45,7 @@ import com.example.fedger.ui.PersonViewModel
 import com.example.fedger.ui.components.EnhancedCard
 import com.example.fedger.ui.components.GradientSurface
 import com.example.fedger.ui.theme.*
+import androidx.compose.foundation.border
 
 /**
  * Unified AddTransactionScreen that handles both specific-person and global transactions
@@ -80,9 +84,9 @@ fun AddTransactionScreen(
     
     // For global mode: track contacts and dropdown state
     val allContacts = if (isGlobalMode) {
-        viewModel!!.persons.collectAsState(initial = emptyList()).value
+        viewModel?.persons?.collectAsState(initial = emptyList())?.value ?: emptyList()
     } else {
-        listOf(preselectedPerson!!)
+        preselectedPerson?.let { listOf(it) } ?: emptyList()
     }
     
     var expanded by remember { mutableStateOf(false) }
@@ -275,180 +279,229 @@ fun AddTransactionScreen(
                                 fontWeight = FontWeight.Medium
                             )
                             
-                            // For person selection
-                            Box(
+                            // Create a simple dropdown menu system
+                            var showContactPicker by remember { mutableStateOf(false) }
+                            var contactSearchQuery by remember { mutableStateOf("") }
+                            
+                            // The contact selection field
+                            OutlinedTextField(
+                                value = selectedContact?.name ?: "",
+                                onValueChange = { /* Read only */ },
+                                placeholder = { Text("Select a contact", color = TextGrey) },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MediumPurple,
+                                    unfocusedBorderColor = LightPurple.copy(alpha = 0.3f),
+                                    focusedTextColor = TextWhite,
+                                    unfocusedTextColor = TextWhite,
+                                    cursorColor = MediumPurple,
+                                    focusedContainerColor = CardBackground.copy(alpha = 0.2f),
+                                    unfocusedContainerColor = CardBackground.copy(alpha = 0.1f),
+                                    disabledTextColor = TextWhite,
+                                    disabledBorderColor = LightPurple.copy(alpha = 0.3f),
+                                    disabledContainerColor = CardBackground.copy(alpha = 0.2f)
+                                ),
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 4.dp, bottom = 4.dp)
-                            ) {
-                                OutlinedTextField(
-                                    value = selectedContact?.name ?: "",
-                                    onValueChange = { /* Read only */ },
-                                    placeholder = { Text("Select a contact", color = TextGrey) },
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = MediumPurple,
-                                        unfocusedBorderColor = LightPurple.copy(alpha = 0.3f),
-                                        focusedTextColor = TextWhite,
-                                        unfocusedTextColor = TextWhite,
-                                        cursorColor = MediumPurple,
-                                        focusedContainerColor = CardBackground.copy(alpha = 0.2f),
-                                        unfocusedContainerColor = CardBackground.copy(alpha = 0.1f),
-                                        disabledTextColor = TextWhite,
-                                        disabledBorderColor = LightPurple.copy(alpha = 0.3f),
-                                        disabledContainerColor = CardBackground.copy(alpha = 0.2f)
-                                    ),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable { expanded = true }
-                                        .semantics { 
-                                            contentDescription = "Contact selection dropdown"
-                                            role = Role.DropdownList
-                                        },
-                                    readOnly = true,
-                                    trailingIcon = {
-                                        IconButton(onClick = { expanded = true }) {
-                                            Icon(
-                                                imageVector = Icons.Default.ArrowDropDown,
-                                                contentDescription = "Expand contact dropdown",
-                                                tint = LightPurple
-                                            )
-                                        }
+                                    .clickable { showContactPicker = true }
+                                    .semantics { 
+                                        contentDescription = "Contact selection field"
+                                        role = Role.Button
                                     },
-                                    isError = contactError != null,
-                                    supportingText = {
-                                        if (contactError != null) {
-                                            Text(
-                                                text = contactError!!,
-                                                color = TextRed,
-                                                style = MaterialTheme.typography.bodySmall
-                                            )
-                                        } else if (selectedContact != null) {
-                                            Text(
-                                                text = "Selected: ${selectedContact.name}",
-                                                color = Color.Green.copy(alpha = 0.8f),
-                                                style = MaterialTheme.typography.bodySmall
-                                            )
-                                        }
-                                    },
-                                    shape = MaterialTheme.shapes.medium,
-                                    enabled = false
-                                )
-                                
-                                // Improved dropdown menu with better styling
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false },
-                                    modifier = Modifier
-                                        .fillMaxWidth(0.9f)
-                                        .background(SurfaceLight)
-                                        .height(350.dp)
-                                ) {
-                                    // Search bar at top of dropdown
-                                    var contactSearchQuery by remember { mutableStateOf("") }
-                                    
-                                    OutlinedTextField(
-                                        value = contactSearchQuery,
-                                        onValueChange = { contactSearchQuery = it },
-                                        placeholder = { Text("Search contacts", color = TextGrey) },
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = MediumPurple,
-                                            unfocusedBorderColor = LightPurple.copy(alpha = 0.3f),
-                                            focusedTextColor = TextWhite,
-                                            unfocusedTextColor = TextWhite,
-                                            cursorColor = MediumPurple,
-                                            focusedContainerColor = CardBackground.copy(alpha = 0.2f),
-                                            unfocusedContainerColor = CardBackground.copy(alpha = 0.1f)
-                                        ),
-                                        leadingIcon = {
-                                            Icon(
-                                                imageVector = Icons.Default.Search,
-                                                contentDescription = "Search contacts",
-                                                tint = LightPurple
-                                            )
-                                        },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                                        singleLine = true,
-                                        shape = MaterialTheme.shapes.small
-                                    )
-                                    
-                                    // Add separator
-                                    Divider(
-                                        color = LightPurple.copy(alpha = 0.3f),
-                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                                    )
-                                    
-                                    // Filter contacts by search query
-                                    val filteredContacts = allContacts.filter { person -> 
-                                        person.name.contains(contactSearchQuery, ignoreCase = true) || 
-                                        person.phoneNumber.contains(contactSearchQuery, ignoreCase = true)
+                                readOnly = true,
+                                trailingIcon = {
+                                    IconButton(onClick = { showContactPicker = true }) {
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowDropDown,
+                                            contentDescription = "Show contacts",
+                                            tint = LightPurple
+                                        )
                                     }
-                                    
-                                    if (filteredContacts.isEmpty()) {
+                                },
+                                isError = contactError != null,
+                                supportingText = {
+                                    if (contactError != null) {
                                         Text(
-                                            text = "No contacts found",
-                                            color = TextGrey,
+                                            text = contactError!!,
+                                            color = TextRed,
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    } else if (selectedContact != null) {
+                                        Text(
+                                            text = "Selected: ${selectedContact.name}",
+                                            color = Color.Green.copy(alpha = 0.8f),
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
+                                },
+                                shape = MaterialTheme.shapes.medium,
+                                enabled = false
+                            )
+                            
+                            // Full screen contact picker dialog
+                            if (showContactPicker) {
+                                AlertDialog(
+                                    onDismissRequest = { showContactPicker = false },
+                                    title = { 
+                                        Text(
+                                            "Select Contact",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = TextWhite
+                                        )
+                                    },
+                                    text = {
+                                        Column(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(16.dp),
-                                            textAlign = TextAlign.Center
-                                        )
-                                    } else {
-                                        filteredContacts.forEach { person ->
-                                            DropdownMenuItem(
-                                                text = {
-                                                    Column {
-                                                        Text(
-                                                            text = person.name,
-                                                            style = MaterialTheme.typography.bodyLarge,
-                                                            fontWeight = if (selectedPersonId == person.id) FontWeight.Bold else FontWeight.Normal
-                                                        )
-                                                        if (person.phoneNumber.isNotEmpty()) {
-                                                            Text(
-                                                                text = person.phoneNumber,
-                                                                style = MaterialTheme.typography.bodySmall,
-                                                                color = TextGrey
+                                                .heightIn(max = 350.dp)
+                                        ) {
+                                            // Search field
+                                            OutlinedTextField(
+                                                value = contactSearchQuery,
+                                                onValueChange = { contactSearchQuery = it },
+                                                placeholder = { Text("Search contacts", color = TextGrey) },
+                                                colors = OutlinedTextFieldDefaults.colors(
+                                                    focusedBorderColor = MediumPurple,
+                                                    unfocusedBorderColor = LightPurple.copy(alpha = 0.3f),
+                                                    focusedTextColor = TextWhite,
+                                                    unfocusedTextColor = TextWhite,
+                                                    cursorColor = MediumPurple,
+                                                    focusedContainerColor = CardBackground.copy(alpha = 0.5f),
+                                                    unfocusedContainerColor = CardBackground.copy(alpha = 0.3f)
+                                                ),
+                                                leadingIcon = {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Search,
+                                                        contentDescription = "Search contacts",
+                                                        tint = LightPurple
+                                                    )
+                                                },
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(bottom = 8.dp),
+                                                singleLine = true,
+                                                shape = MaterialTheme.shapes.small
+                                            )
+                                            
+                                            // Divider
+                                            HorizontalDivider(
+                                                color = LightPurple.copy(alpha = 0.3f),
+                                                modifier = Modifier.padding(bottom = 8.dp)
+                                            )
+                                            
+                                            // Filter contacts
+                                            val filteredContacts = allContacts.filter { person -> 
+                                                person.name.contains(contactSearchQuery, ignoreCase = true) || 
+                                                person.phoneNumber.contains(contactSearchQuery, ignoreCase = true)
+                                            }
+                                            
+                                            // Contact list
+                                            if (filteredContacts.isEmpty()) {
+                                                Text(
+                                                    text = "No contacts found",
+                                                    color = TextGrey,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(16.dp),
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            } else {
+                                                Column(
+                                                    modifier = Modifier
+                                                        .verticalScroll(rememberScrollState())
+                                                ) {
+                                                    filteredContacts.forEach { person ->
+                                                        Row(
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .clickable {
+                                                                    selectedPersonId = person.id
+                                                                    contactError = null
+                                                                    showContactPicker = false
+                                                                }
+                                                                .padding(vertical = 8.dp, horizontal = 4.dp)
+                                                                .background(
+                                                                    if (selectedPersonId == person.id)
+                                                                        MediumPurple.copy(alpha = 0.2f)
+                                                                    else
+                                                                        Color.Transparent,
+                                                                    shape = MaterialTheme.shapes.small
+                                                                ),
+                                                            verticalAlignment = Alignment.CenterVertically
+                                                        ) {
+                                                            // Avatar
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .size(40.dp)
+                                                                    .padding(4.dp)
+                                                                    .clip(CircleShape)
+                                                                    .background(MediumPurple.copy(alpha = 0.3f)),
+                                                                contentAlignment = Alignment.Center
+                                                            ) {
+                                                                Text(
+                                                                    text = person.name.firstOrNull()?.toString() ?: "?",
+                                                                    color = TextWhite,
+                                                                    fontWeight = FontWeight.Medium
+                                                                )
+                                                            }
+                                                            
+                                                            // Contact details
+                                                            Column(
+                                                                modifier = Modifier
+                                                                    .weight(1f)
+                                                                    .padding(start = 8.dp)
+                                                            ) {
+                                                                Text(
+                                                                    text = person.name,
+                                                                    color = TextWhite,
+                                                                    style = MaterialTheme.typography.bodyLarge,
+                                                                    fontWeight = if (selectedPersonId == person.id) 
+                                                                        FontWeight.Bold else FontWeight.Normal
+                                                                )
+                                                                if (person.phoneNumber.isNotEmpty()) {
+                                                                    Text(
+                                                                        text = person.phoneNumber,
+                                                                        color = TextGrey,
+                                                                        style = MaterialTheme.typography.bodySmall
+                                                                    )
+                                                                }
+                                                            }
+                                                            
+                                                            // Selected check mark
+                                                            if (selectedPersonId == person.id) {
+                                                                Icon(
+                                                                    imageVector = Icons.Default.Check,
+                                                                    contentDescription = "Selected",
+                                                                    tint = AccentTeal,
+                                                                    modifier = Modifier.padding(4.dp)
+                                                                )
+                                                            }
+                                                        }
+                                                        
+                                                        // Only add divider if not the last item
+                                                        if (person != filteredContacts.last()) {
+                                                            HorizontalDivider(
+                                                                color = LightPurple.copy(alpha = 0.1f),
+                                                                modifier = Modifier.padding(start = 48.dp)
                                                             )
                                                         }
                                                     }
-                                                },
-                                                onClick = {
-                                                    selectedPersonId = person.id
-                                                    contactError = null
-                                                    expanded = false
-                                                },
-                                                leadingIcon = {
-                                                    // Show an avatar/icon
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .size(32.dp)
-                                                            .clip(CircleShape)
-                                                            .background(MediumPurple.copy(alpha = 0.2f)),
-                                                        contentAlignment = Alignment.Center
-                                                    ) {
-                                                        Text(
-                                                            text = person.name.firstOrNull()?.toString() ?: "?",
-                                                            color = TextWhite
-                                                        )
-                                                    }
-                                                },
-                                                trailingIcon = if (selectedPersonId == person.id) {
-                                                    {
-                                                        Icon(
-                                                            imageVector = Icons.Default.Check,
-                                                            contentDescription = "Selected",
-                                                            tint = MediumPurple
-                                                        )
-                                                    }
-                                                } else null,
-                                                modifier = Modifier.background(
-                                                    if (selectedPersonId == person.id) MediumPurple.copy(alpha = 0.1f) else Color.Transparent
-                                                )
-                                            )
+                                                }
+                                            }
                                         }
-                                    }
-                                }
+                                    },
+                                    confirmButton = {
+                                        TextButton(
+                                            onClick = { showContactPicker = false },
+                                            colors = ButtonDefaults.textButtonColors(
+                                                contentColor = TextWhite
+                                            )
+                                        ) {
+                                            Text("Done")
+                                        }
+                                    },
+                                    containerColor = CardBackground,
+                                    shape = MaterialTheme.shapes.medium
+                                )
                             }
                         }
                         
@@ -651,16 +704,15 @@ fun AddTransactionScreen(
                         // If in global mode, make sure a person is selected
                         // If in specific mode, use the preselected person
                         val personId = if (isGlobalMode) selectedPersonId else preselectedPerson?.id
-                        
                         // Double-check that we have a valid personId
                         personId?.let { id ->
-                        val transaction = Transaction(
+                            val transaction = Transaction(
                                 personId = id,
-                            amount = amount.toDouble(),
-                            description = description,
+                                amount = amount.toDouble(),
+                                description = description,
                                 isCredit = transactionType == "sent" // true for "To Receive", false for "To Pay"
-                        )
-                        onTransactionAdded(transaction)
+                            )
+                            onTransactionAdded(transaction)
                         } ?: run {
                             // This shouldn't happen due to validation, but just in case
                             if (isGlobalMode) {
@@ -672,14 +724,20 @@ fun AddTransactionScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                    .padding(vertical = 8.dp),
+                    .border(
+                        width = 1.dp,
+                        color = LightPurple.copy(alpha = 0.3f),
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                shape = MaterialTheme.shapes.medium,
                 colors = ButtonDefaults.elevatedButtonColors(
                     containerColor = MediumPurple,
                     contentColor = TextWhite
                 ),
                 elevation = ButtonDefaults.elevatedButtonElevation(
                     defaultElevation = 4.dp
-                )
+                ),
+                contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,

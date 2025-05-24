@@ -77,6 +77,7 @@ fun FedgerTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
+            @Suppress("DEPRECATION")
             window.statusBarColor = DeepPurple.toArgb() // Use our deep purple for status bar
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }

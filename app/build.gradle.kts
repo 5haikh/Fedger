@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.devtools.ksp") version "1.9.21-1.0.15"
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -18,12 +19,25 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Add KSP generated sources to source sets
+    sourceSets {
+        getByName("main") {
+            kotlin.srcDir("build/generated/ksp/main/kotlin")
+        }
+        getByName("test") {
+            kotlin.srcDir("build/generated/ksp/test/kotlin")
+        }
+        getByName("androidTest") {
+            kotlin.srcDir("build/generated/ksp/androidTest/kotlin")
+        }
+    }
+
     signingConfigs {
         create("release") {
-            storeFile = file("../keystore/fedger.keystore")
-            storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "fedger123"
-            keyAlias = System.getenv("KEY_ALIAS") ?: "fedger"
-            keyPassword = System.getenv("KEY_PASSWORD") ?: "fedger123"
+            storeFile = file("../fedger-release-key.jks")
+            storePassword = "fedger123"
+            keyAlias = "fedgerkey"
+            keyPassword = "fedger123"
         }
     }
 
@@ -64,11 +78,11 @@ android {
 
 dependencies {
     // Core Android dependencies
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     
     // Compose dependencies
-    implementation(libs.androidx.activity.compose)
+    implementation("androidx.activity:activity-compose:1.8.2")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
@@ -89,8 +103,12 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
     
     // ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     
     // Gson for JSON serialization/deserialization
     implementation("com.google.code.gson:gson:2.10.1")

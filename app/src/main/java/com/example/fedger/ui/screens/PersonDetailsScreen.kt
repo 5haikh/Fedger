@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.border
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -64,8 +66,11 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.Role
@@ -84,6 +89,9 @@ import com.example.fedger.ui.theme.TextRed
 import com.example.fedger.ui.theme.TextWhite
 import com.example.fedger.ui.theme.CardBackground
 import com.example.fedger.ui.theme.HighContrastGrey
+import com.example.fedger.ui.theme.PurpleHighlight
+import com.example.fedger.ui.theme.DeepPurple
+import com.example.fedger.ui.theme.LightPurple
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -101,6 +109,17 @@ import com.example.fedger.ui.components.EnhancedCard
 import com.example.fedger.ui.components.TransactionCard
 import com.example.fedger.ui.components.GradientSurface
 import com.example.fedger.ui.components.StyledLoadingIndicator
+import androidx.compose.material.SwipeToDismiss
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissValue
+import androidx.compose.material.rememberDismissState
+import androidx.compose.material.DismissState
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.draw.scale
+import androidx.navigation.NavController
+import com.example.fedger.ui.components.AppSwitcher
+import android.widget.Toast
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -108,7 +127,8 @@ fun PersonDetailsScreen(
     personId: Int,
     viewModel: PersonViewModel,
     onBackClick: () -> Unit,
-    onAddTransactionClick: () -> Unit
+    onAddTransactionClick: () -> Unit,
+    navController: NavController
 ) {
     val personState by viewModel.getPersonById(personId).collectAsState(initial = null)
     val person = personState ?: return
@@ -186,16 +206,56 @@ fun PersonDetailsScreen(
         }
     }
     
-    fun onDeleteTransaction(transaction: Transaction) {
-        viewModel.deleteTransaction(transaction)
-        // Force a balance update after transaction is deleted
-        balanceVersion++
+    // Add this extra LaunchedEffect for getting verified balance:
+    LaunchedEffect(personId) {
+        // Use our new method to get the person with guaranteed accurate balance
+        viewModel.getPersonWithLiveBalance(personId).collect { updatedPerson ->
+            // The repository already updated the actual database - no need to do anything here
+            // This collect just ensures we're subscribed to any balance recalculations
+        }
     }
     
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Back to Persons", color = TextWhite) },
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .shadow(
+                                    elevation = 6.dp,
+                                    shape = CircleShape
+                                )
+                                .clip(CircleShape)
+                                .background(
+                                    brush = Brush.radialGradient(
+                                        colors = listOf(
+                                            MediumPurple,
+                                            MediumPurple.copy(alpha = 0.9f)
+                                        )
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "₹",
+                                color = TextWhite,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "Fedger",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = TextWhite,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(
                         onClick = onBackClick,
@@ -211,9 +271,12 @@ fun PersonDetailsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
+                    containerColor = DeepPurple,
                     titleContentColor = MaterialTheme.colorScheme.onBackground
-                )
+                ),
+                actions = {
+                    // App Switcher removed as requested
+                }
             )
         }
     ) { padding ->
@@ -294,8 +357,8 @@ fun PersonDetailsScreen(
                                 visible = true,
                                 enter = fadeIn() + expandVertically(),
                                 exit = fadeOut() + shrinkVertically(),
-                                modifier = Modifier.animateItemPlacement(
-                                    animationSpec = spring(
+                                modifier = Modifier.animateItem(
+                                    placementSpec = spring(
                                         dampingRatio = Spring.DampingRatioMediumBouncy,
                                         stiffness = Spring.StiffnessMediumLow
                                     )
@@ -343,6 +406,8 @@ fun PersonDetailsScreen(
             
             // Show delete transaction confirmation dialog
             if (showDeleteDialog && transactionToDelete != null) {
+                val context = LocalContext.current
+                
                 AlertDialog(
                     onDismissRequest = { 
                         showDeleteDialog = false 
@@ -359,7 +424,28 @@ fun PersonDetailsScreen(
                     confirmButton = {
                         TextButton(
                             onClick = {
-                                transactionToDelete?.let { onDeleteTransaction(it) }
+                                // Handle deletion right here inside the dialog onClick
+                                transactionToDelete?.let { transaction ->
+                                    // Create toast message
+                                    val amount = transaction.amount
+                                    val isCredit = transaction.isCredit
+                                    val formattedAmount = String.format("₹%.2f", amount)
+                                    
+                                    // Show feedback toast
+                                    val message = if (isCredit) {
+                                        "Removed \"to receive\" of $formattedAmount"
+                                    } else {
+                                        "Removed \"to pay\" of $formattedAmount"
+                                    }
+                                    
+                                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                    
+                                    // Then delete the transaction
+                                    viewModel.deleteTransaction(transaction)
+                                    
+                                    // Force balance update
+                                    balanceVersion++
+                                }
                                 showDeleteDialog = false
                                 transactionToDelete = null
                             }
@@ -390,6 +476,8 @@ fun PersonInfoCard(
     balance: Double,
     onAddTransactionClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    
     EnhancedCard(
         modifier = Modifier.fillMaxWidth(),
         elevation = 6.dp
@@ -422,11 +510,19 @@ fun PersonInfoCard(
                 
                 Button(
                     onClick = onAddTransactionClick,
-                    colors = ButtonDefaults.buttonColors(containerColor = MediumPurple),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    modifier = Modifier.semantics {
-                        contentDescription = "Add new transaction with ${person.name}"
-                    }
+                    colors = ButtonDefaults.buttonColors(containerColor = MediumPurple, contentColor = TextWhite),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                    modifier = Modifier
+                        .height(56.dp)
+                        .border(
+                            width = 1.dp,
+                            color = LightPurple.copy(alpha = 0.3f),
+                            shape = MaterialTheme.shapes.medium
+                        )
+                        .semantics {
+                            contentDescription = "Add new transaction with ${person.name}"
+                        },
+                    shape = MaterialTheme.shapes.medium
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -493,10 +589,37 @@ fun PersonInfoCard(
                     )
                 }
             }
+            
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(
+                    onClick = { /* Keep this empty until viewModel is available */ },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = LightPurple
+                    ),
+                    modifier = Modifier.padding(end = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Verify Balances",
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Verify",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TransactionItem(
     transaction: Transaction,
@@ -504,69 +627,80 @@ fun TransactionItem(
     modifier: Modifier = Modifier
 ) {
     val dateFormatter = remember { SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()) }
-    
-    TransactionCard(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = { /* Do nothing on click, just display details */ },
-        isHighlighted = false
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Transaction amount and type
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    val isExpense = !transaction.isCredit
-                    val amountColor = if (isExpense) TextRed else Color.Green.copy(alpha = 0.8f)
-                    val amountPrefix = if (isExpense) "-" else "+"
-                    
-                    Text(
-                        text = "$amountPrefix₹${String.format("%.2f", abs(transaction.amount))}",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = amountColor,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                Text(
-                    text = transaction.description.ifEmpty { "No description" },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = TextWhite.copy(alpha = 0.7f),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                Text(
-                    text = dateFormatter.format(Date(transaction.date)),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = TextWhite.copy(alpha = 0.6f)
-                )
+    val haptic = LocalHapticFeedback.current
+    val dismissState = rememberDismissState(
+        confirmStateChange = {
+            if (it == DismissValue.DismissedToStart) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onDeleteClick()
             }
-            
-            // Delete button with improved interaction
-            IconButton(
-                onClick = onDeleteClick,
+            false // Don't auto-dismiss, let the parent handle removal
+        }
+    )
+    SwipeToDismiss(
+        state = dismissState,
+        directions = setOf(DismissDirection.EndToStart),
+        background = {
+            val progress = dismissState.progress.fraction
+            val iconScale = 1f + 0.6f * progress.coerceIn(0f, 1f)
+            Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .semantics {
-                        contentDescription = "Delete this transaction"
-                        role = Role.Button
-                    }
+                    .fillMaxSize()
+                    .padding(end = 24.dp),
+                contentAlignment = Alignment.CenterEnd
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    tint = TextRed.copy(alpha = 0.7f)
+                    contentDescription = "Delete",
+                    tint = TextRed,
+                    modifier = Modifier.scale(iconScale)
                 )
             }
+        },
+        dismissContent = {
+            TransactionCard(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { /* Do nothing on click, just display details */ },
+                isHighlighted = false
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Transaction amount and type
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            val isExpense = !transaction.isCredit
+                            val amountColor = if (isExpense) TextRed else Color.Green.copy(alpha = 0.8f)
+                            val amountPrefix = if (isExpense) "-" else "+"
+                            Text(
+                                text = "$amountPrefix₹${String.format("%.2f", abs(transaction.amount))}",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = amountColor,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = transaction.description.ifEmpty { "No description" },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = TextWhite.copy(alpha = 0.7f),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = dateFormatter.format(Date(transaction.date)),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = TextWhite.copy(alpha = 0.6f)
+                        )
+                    }
+                    // Removed IconButton for delete
+                }
+            }
         }
-    }
+    )
 }
 
 /**

@@ -105,7 +105,7 @@ fun StyledLoadingIndicator(
         CircularProgressIndicator(
             modifier = Modifier
                 .size((36 * size).dp),
-            progress = rotationAnim / 360f,
+            progress = { rotationAnim / 360f },
             color = MediumPurple,
             strokeWidth = (3 * size).dp,
             strokeCap = StrokeCap.Round

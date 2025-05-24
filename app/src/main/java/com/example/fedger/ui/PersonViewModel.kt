@@ -13,6 +13,7 @@ import com.example.fedger.model.Transaction
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Job
 import kotlin.math.abs
 import kotlinx.coroutines.delay
 
@@ -28,7 +29,14 @@ enum class PersonSortOption {
 }
 
 class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
-    val persons = repository.allPersons
+    // Persons list - shared with proper lifecycle scope
+    val persons = repository.allPersons.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000), // Keep data for 5 seconds after last subscriber
+        emptyList()
+    )
+    
+    // Selected person
     private val _selectedPerson = MutableStateFlow<Person?>(null)
     val selectedPerson: StateFlow<Person?> = _selectedPerson.asStateFlow()
 
@@ -77,9 +85,10 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
     private val PAGE_SIZE = 10
     private val TRANSACTION_PAGE_SIZE = 15
     
+    // Transactions with proper lifecycle management
     val allTransactions = repository.allTransactions.stateIn(
         viewModelScope,
-        SharingStarted.Lazily,
+        SharingStarted.WhileSubscribed(5000),
         emptyList()
     )
     
@@ -91,7 +100,7 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
     private val _totalBalance = MutableStateFlow(TotalBalanceSummary(0.0, 0.0))
     val totalBalance: StateFlow<TotalBalanceSummary> = _totalBalance.asStateFlow()
     
-    // Error state for UI to observe
+    // Error state for UI to observe with timeout handling
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
     
@@ -106,11 +115,31 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
     private val _importExportState = MutableStateFlow<ImportExportState>(ImportExportState.Idle)
     val importExportState: StateFlow<ImportExportState> = _importExportState.asStateFlow()
     
-    // Define a coroutine exception handler for DB operations
+    // Job for tracking error timeout
+    private var errorTimeoutJob: Job? = null
+    
+    // Error timeout duration in milliseconds (default: 5 seconds)
+    private val ERROR_TIMEOUT_DURATION = 5000L
+    
+    // Enhanced exception handler
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        _error.value = "Error: ${throwable.localizedMessage ?: "Unknown error occurred"}"
+        val errorMessage = "Error: ${throwable.localizedMessage ?: "Unknown error occurred"}"
+        setError(errorMessage)
         _isLoading.value = false
         _isLoadingTransactions.value = false
+        Log.e(TAG, "Exception caught in ViewModel", throwable)
+    }
+    
+    // Helper method to run coroutines with proper error handling
+    private fun launchWithErrorHandling(block: suspend () -> Unit) {
+        viewModelScope.launch(exceptionHandler) {
+            try {
+                block()
+            } catch (e: Exception) {
+                setError("Error: ${e.localizedMessage ?: "Unknown error occurred"}")
+                Log.e(TAG, "Error in ViewModel operation", e)
+            }
+        }
     }
     
     init {
@@ -317,9 +346,15 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
     }
     
     fun refreshTransactions() {
-        val personId = _currentPersonId.value ?: return
+        val personId = _currentPersonId.value
         
         viewModelScope.launch(exceptionHandler) {
+            if (personId == null) {
+                // If no specific person is selected, just refresh all transactions
+                Log.d(TAG, "No person selected for transaction refresh, skipping")
+                return@launch
+            }
+            
             Log.d(TAG, "Forcing transaction refresh for person $personId")
             _isLoadingTransactions.value = true
             
@@ -444,16 +479,9 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
     }
 
     fun deletePerson(person: Person) {
-        viewModelScope.launch(exceptionHandler) {
-            try {
-                repository.deletePerson(person)
-                // Remove the person from the current list if present
-                _pagedPersons.value = _pagedPersons.value.filter { it.id != person.id }
-                // Clear any previous errors on success
-                _error.value = null
-            } catch (e: Exception) {
-                _error.value = "Failed to delete person: ${e.localizedMessage ?: "Unknown error"}"
-            }
+        launchWithErrorHandling {
+            repository.deletePerson(person)
+            _error.value = null // Clear error state if operation succeeds
         }
     }
 
@@ -474,34 +502,36 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
     fun addTransaction(transaction: Transaction) {
         viewModelScope.launch(exceptionHandler) {
             try {
-                // Save the transaction to the database
+                // Save the transaction to the database - repository now handles balance updates
                 repository.insertTransaction(transaction)
                 Log.d(TAG, "Transaction added for person ${transaction.personId}")
                 
-                // Update person's balance through the repository for consistency
-                val personId = transaction.personId
-                repository.recalculatePersonBalance(personId)
-                
-                // After recalculation, fetch the updated balance from the database
-                repository.getPersonById(personId).first()?.let { updatedPerson ->
-                    // Update the balances map with the correctly calculated balance
-                    _balances.update { currentBalances ->
-                        currentBalances.toMutableMap().apply {
-                            this[personId] = updatedPerson.balance
-                        }
-                    }
-                }
+                // The repository now handles balance updates in a transaction
+                // We just need to update our local state
                 
                 // Set the currentPersonId if not set already
                 if (_currentPersonId.value == null) {
-                    _currentPersonId.value = personId
+                    _currentPersonId.value = transaction.personId
                 }
                 
-                // Always force a refresh of transactions list regardless of current person
-                if (_currentPersonId.value == transaction.personId) {
-                    Log.d(TAG, "Forcing transaction refresh after adding transaction")
-                    refreshTransactions()
+                // Get the updated person to ensure consistent state in the UI
+                repository.getPersonById(transaction.personId).first()?.let { updatedPerson ->
+                    // Update the balances map with the updated balance from the database
+                    _balances.update { currentBalances ->
+                        currentBalances.toMutableMap().apply {
+                            this[transaction.personId] = updatedPerson.balance
+                        }
+                    }
+                    
+                    // Update the person in the list
+                    updatePersonInList(updatedPerson)
                 }
+                
+                // Force a refresh of transactions list
+                refreshTransactions()
+                
+                // Also update the total balance summary
+                updateTotalBalanceSummary()
                 
                 // Clear any previous errors on success
                 _error.value = null
@@ -509,6 +539,16 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
                 Log.e(TAG, "Failed to add transaction", e)
                 _error.value = "Failed to add transaction: ${e.localizedMessage ?: "Unknown error"}"
             }
+        }
+    }
+    
+    // Helper function to update a person in the pagination list
+    private fun updatePersonInList(updatedPerson: Person) {
+        val currentList = _pagedPersons.value.toMutableList()
+        val index = currentList.indexOfFirst { it.id == updatedPerson.id }
+        if (index >= 0) {
+            currentList[index] = updatedPerson
+            _pagedPersons.value = currentList
         }
     }
     
@@ -524,33 +564,34 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
                     _pagedTransactions.value = currentList
                 }
                 
-                // Then delete from the database
+                // Delete transaction - repository now handles balance updates
                 repository.deleteTransaction(transaction)
                 Log.d(TAG, "Transaction deleted for person ${transaction.personId}")
                 
-                // Update transaction count immediately
+                // Update transaction count immediately for better UI responsiveness
                 _totalTransactionCount.value = _totalTransactionCount.value - 1
                 
-                // Update person's balance using the repository's recalculate method 
-                // instead of manual calculation for consistency
-                val personId = transaction.personId
-                repository.recalculatePersonBalance(personId)
-                
-                // After recalculation, fetch the updated balance from the database
-                repository.getPersonById(personId).first()?.let { updatedPerson ->
-                    // Update the balances map with the correctly calculated balance
+                // Get the updated person to ensure consistent state in the UI
+                repository.getPersonById(transaction.personId).first()?.let { updatedPerson ->
+                    // Update the balances map with the updated balance from the database
                     _balances.update { currentBalances ->
                         currentBalances.toMutableMap().apply {
-                            this[personId] = updatedPerson.balance
+                            this[transaction.personId] = updatedPerson.balance
                         }
                     }
+                    
+                    // Update the person in the list
+                    updatePersonInList(updatedPerson)
                 }
                 
-                // Force a complete refresh of transaction list if this is the current person
-                // But only do it if we have very few transactions to avoid UI flicker
-                if (_currentPersonId.value == transaction.personId && _pagedTransactions.value.size < 5) {
+                // Force a refresh of transactions (after a short delay to let the UI update)
+                viewModelScope.launch {
+                    delay(300) // Short delay for better UI experience
                     refreshTransactions()
                 }
+                
+                // Also update the total balance summary
+                updateTotalBalanceSummary()
                 
                 // Clear any previous errors on success
                 _error.value = null
@@ -559,11 +600,42 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
                 _error.value = "Failed to delete transaction: ${e.localizedMessage ?: "Unknown error"}"
                 
                 // On error, force a complete refresh to ensure UI consistency
-                if (_currentPersonId.value == transaction.personId) {
-                    refreshTransactions()
-                }
+                refreshTransactions()
             }
         }
+    }
+
+    // Add a function to verify all balances
+    fun verifyAllBalances() {
+        viewModelScope.launch(exceptionHandler) {
+            try {
+                _isLoading.value = true
+                
+                val fixedCount = repository.verifyAllBalances()
+                
+                if (fixedCount > 0) {
+                    _error.value = "Fixed $fixedCount inconsistent balances"
+                    
+                    // Refresh the data to show the corrected balances
+                    refreshData()
+                    
+                    // Also update the total balance summary
+                    updateTotalBalanceSummary()
+                } else {
+                    _error.value = "All balances are correct"
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to verify balances", e)
+                _error.value = "Failed to verify balances: ${e.localizedMessage ?: "Unknown error"}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+    
+    // Add a function to get a person with live balance (useful for critical screens)
+    fun getPersonWithLiveBalance(personId: Int): Flow<Person?> {
+        return repository.getPersonWithLiveBalance(personId)
     }
 
     // Add a function to update an existing transaction
@@ -585,12 +657,16 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
                             this[personId] = updatedPerson.balance
                         }
                     }
+                    
+                    // Update the person in the list to reflect the new balance
+                    updatePersonInList(updatedPerson)
                 }
                 
-                // Force a refresh of transactions if we're viewing the person who owns this transaction
-                if (_currentPersonId.value == transaction.personId) {
-                    refreshTransactions()
-                }
+                // Force a refresh of transactions
+                refreshTransactions()
+                
+                // Also update the total balance summary
+                updateTotalBalanceSummary()
                 
                 // Clear any previous errors on success
                 _error.value = null
@@ -620,8 +696,26 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
             }
     }
     
-    // Clear error state
+    // Error handling with timeout
+    private fun setError(errorMessage: String?) {
+        // Cancel any existing timeout job
+        errorTimeoutJob?.cancel()
+        
+        // Set the error message
+        _error.value = errorMessage
+        
+        // If error is not null, start a timeout to clear it automatically
+        if (errorMessage != null) {
+            errorTimeoutJob = viewModelScope.launch {
+                delay(ERROR_TIMEOUT_DURATION)
+                _error.value = null
+            }
+        }
+    }
+    
+    // Clear error immediately (can be called manually if needed)
     fun clearError() {
+        errorTimeoutJob?.cancel()
         _error.value = null
     }
     
@@ -791,35 +885,59 @@ class PersonViewModel(private val repository: FedgerRepository) : ViewModel() {
         }
     }
     
-    // Function to sort the current person list - now simpler as the main logic moved to setSortOption
-    private fun sortPersonList(sortOption: PersonSortOption) {
-        if (_isLoading.value) return
+    // Safe sorting function to avoid concurrent modification
+    private fun sortPersons(persons: List<Person>, sortOption: PersonSortOption): List<Person> {
+        // Create a new list to avoid concurrent modification
+        val personsCopy = persons.toList()
+        
+        return when (sortOption) {
+            PersonSortOption.NAME_ASC -> 
+                personsCopy.sortedBy { it.name.lowercase() }
+                
+            PersonSortOption.NAME_DESC -> 
+                personsCopy.sortedByDescending { it.name.lowercase() }
+                
+            PersonSortOption.BALANCE_HIGH_TO_LOW -> 
+                personsCopy.sortedByDescending { balances.value[it.id] ?: it.balance }
+                
+            PersonSortOption.BALANCE_LOW_TO_HIGH -> 
+                personsCopy.sortedBy { balances.value[it.id] ?: it.balance }
+                
+            PersonSortOption.LAST_ADDED -> 
+                personsCopy.sortedByDescending { it.id }
+        }
+    }
+
+    // Update sort implementation to avoid concurrent modification
+    fun sortPersonList(sortOption: PersonSortOption) {
+        _isLoading.value = true
         
         viewModelScope.launch {
             try {
-                _isLoading.value = true
-                val sortedList = sortPersons(_pagedPersons.value, sortOption)
+                val currentList = if (_showingSearchResults.value) {
+                    // Use toList() to create a copy before sorting
+                    repository.searchPagedPersons(_searchQuery.value, 1000, 0).first().toList()
+                } else {
+                    // Use toList() to create a copy before sorting
+                    repository.getPagedPersons(1000, 0).first().toList()
+                }
+                
+                val sortedList = sortPersons(currentList, sortOption)
+                
                 _pagedPersons.value = sortedList
+                _currentSortOption.value = sortOption
+            } catch (e: Exception) {
+                _error.value = "Error sorting list: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
         }
     }
-    
-    // Function to sort a list of persons based on the sort option
-    private fun sortPersons(persons: List<Person>, sortOption: PersonSortOption): List<Person> {
-        return when (sortOption) {
-            PersonSortOption.NAME_ASC -> 
-                persons.sortedBy { it.name.lowercase() }
-            PersonSortOption.NAME_DESC -> 
-                persons.sortedByDescending { it.name.lowercase() }
-            PersonSortOption.BALANCE_HIGH_TO_LOW -> 
-                persons.sortedByDescending { _balances.value[it.id] ?: 0.0 }
-            PersonSortOption.BALANCE_LOW_TO_HIGH -> 
-                persons.sortedBy { _balances.value[it.id] ?: 0.0 }
-            PersonSortOption.LAST_ADDED -> 
-                persons.sortedByDescending { it.id } // Assuming higher ID = more recently added
-        }
+
+    // Clean up resources when ViewModel is cleared
+    override fun onCleared() {
+        super.onCleared()
+        errorTimeoutJob?.cancel()
     }
 }
 

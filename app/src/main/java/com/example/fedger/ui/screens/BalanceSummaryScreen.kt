@@ -26,12 +26,15 @@ import com.example.fedger.ui.components.AccentCard
 import com.example.fedger.ui.components.EnhancedCard
 import com.example.fedger.ui.theme.*
 import kotlin.math.abs
+import androidx.navigation.NavController
+import com.example.fedger.ui.components.AppSwitcher
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BalanceSummaryScreen(
     viewModel: PersonViewModel,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    navController: NavController
 ) {
     // Observe total balance data
     val totalBalance by viewModel.totalBalance.collectAsState()
@@ -110,7 +113,10 @@ fun BalanceSummaryScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = DeepPurple,
                     titleContentColor = MaterialTheme.colorScheme.onBackground
-                )
+                ),
+                actions = {
+                    // App Switcher removed as requested
+                }
             )
         }
     ) { padding ->
@@ -279,9 +285,11 @@ fun BalanceSummaryScreen(
                         color = PurpleHighlight
                     )
                     
-                    Divider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = SurfaceLight.copy(alpha = 0.3f)
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        color = TextGrey.copy(alpha = 0.3f)
                     )
                     
                     SummaryItem(
@@ -290,9 +298,11 @@ fun BalanceSummaryScreen(
                         color = AccentAmber
                     )
                     
-                    Divider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = SurfaceLight.copy(alpha = 0.3f)
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        color = TextGrey.copy(alpha = 0.3f)
                     )
                     
                     SummaryItem(
@@ -301,9 +311,11 @@ fun BalanceSummaryScreen(
                         color = TextGreen
                     )
                     
-                    Divider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = SurfaceLight.copy(alpha = 0.3f)
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        color = TextGrey.copy(alpha = 0.3f)
                     )
                     
                     SummaryItem(
@@ -312,9 +324,11 @@ fun BalanceSummaryScreen(
                         color = TextRed
                     )
                     
-                    Divider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = SurfaceLight.copy(alpha = 0.3f)
+                    HorizontalDivider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        color = TextGrey.copy(alpha = 0.3f)
                     )
                     
                     SummaryItem(

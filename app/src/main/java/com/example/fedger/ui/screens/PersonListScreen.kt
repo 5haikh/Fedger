@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -65,11 +66,23 @@ import com.example.fedger.ui.components.EnhancedCard
 import com.example.fedger.ui.components.ItemAnimations
 import com.example.fedger.ui.components.StyledLoadingIndicator
 import com.example.fedger.ui.components.AccentCard
+import com.example.fedger.ui.components.AppSwitcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.material.SwipeToDismiss
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissValue
+import androidx.compose.material.rememberDismissState
+import androidx.compose.material.DismissState
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.navigation.NavController
 
+@Suppress("DEPRECATION")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun PersonListScreen(
@@ -77,7 +90,8 @@ fun PersonListScreen(
     onAddClick: () -> Unit,
     onDeleteClick: (Person) -> Unit,
     onImportExportClick: () -> Unit,
-    viewModel: PersonViewModel = viewModel()
+    viewModel: PersonViewModel = viewModel(),
+    navController: NavController
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     var personToDelete by remember { mutableStateOf<Person?>(null) }
@@ -88,9 +102,6 @@ fun PersonListScreen(
     val showingSearchResults by viewModel.showingSearchResults.collectAsState()
     val currentSortOption by viewModel.currentSortOption.collectAsState()
     val lazyListState = rememberLazyListState()
-    
-    // Bottom sheet for action menu
-    var showActionMenu by remember { mutableStateOf(false) }
     
     // Pull-to-refresh state
     var refreshing by remember { mutableStateOf(false) }
@@ -158,8 +169,7 @@ fun PersonListScreen(
                                 .size(44.dp)
                                 .shadow(
                                     elevation = 6.dp,
-                                    shape = CircleShape,
-                                    spotColor = PurpleHighlight
+                                    shape = CircleShape
                                 )
                                 .clip(CircleShape)
                                 .background(
@@ -189,16 +199,17 @@ fun PersonListScreen(
                     }
                 },
                 actions = {
-                    // Add menu button
-                    IconButton(
-                        onClick = { showActionMenu = true },
-                        modifier = Modifier.semantics { 
-                            contentDescription = "Open menu options"
-                        }
-                    ) {
+                    // App Switcher
+                    AppSwitcher(
+                        navController = navController,
+                        currentApp = "Ledger"
+                    )
+                    
+                    // Import/Export button
+                    IconButton(onClick = { onImportExportClick() }) {
                         Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = null,
+                            Icons.Default.ImportExport,
+                            contentDescription = "Import/Export Data",
                             tint = TextWhite
                         )
                     }
@@ -269,37 +280,52 @@ fun PersonListScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
                         text = "Sort by:",
                         style = MaterialTheme.typography.bodyMedium,
                         color = TextGrey
                     )
-                    
-                    Box {
+                    Surface(
+                        tonalElevation = 4.dp,
+                        shadowElevation = 8.dp,
+                        shape = MaterialTheme.shapes.medium,
+                                border = BorderStroke(1.dp, LightPurple.copy(alpha = 0.3f)),
+                        color = CardBackground.copy(alpha = 0.85f),
+                        modifier = Modifier
+                            .height(40.dp)
+                            .defaultMinSize(minWidth = 160.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) { showSortDropdown = true }
+                            .semantics {
+                                contentDescription = "Open sort options menu, currently sorted by: ${
+                                    when(currentSortOption) {
+                                        PersonSortOption.NAME_ASC -> "Name (A-Z)"
+                                        PersonSortOption.NAME_DESC -> "Name (Z-A)"
+                                        PersonSortOption.BALANCE_HIGH_TO_LOW -> "Balance (High to Low)"
+                                        PersonSortOption.BALANCE_LOW_TO_HIGH -> "Balance (Low to High)"
+                                        PersonSortOption.LAST_ADDED -> "Recently Added"
+                                    }
+                                }"
+                            }
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
                             modifier = Modifier
-                                .clickable { showSortDropdown = true }
-                                .background(
-                                    color = CardBackground,
-                                    shape = MaterialTheme.shapes.small
-                                )
-                                .padding(horizontal = 12.dp, vertical = 8.dp)
-                                .semantics {
-                                    contentDescription = "Open sort options menu, currently sorted by: ${
-                                        when(currentSortOption) {
-                                            PersonSortOption.NAME_ASC -> "Name (A-Z)"
-                                            PersonSortOption.NAME_DESC -> "Name (Z-A)"
-                                            PersonSortOption.BALANCE_HIGH_TO_LOW -> "Balance (High to Low)"
-                                            PersonSortOption.BALANCE_LOW_TO_HIGH -> "Balance (Low to High)"
-                                            PersonSortOption.LAST_ADDED -> "Recently Added"
-                                        }
-                                    }"
-                                }
+                                .fillMaxHeight()
+                                .padding(horizontal = 16.dp)
                         ) {
                             Text(
                                 text = when(currentSortOption) {
@@ -313,65 +339,63 @@ fun PersonListScreen(
                                 color = TextWhite,
                                 fontWeight = FontWeight.Medium
                             )
-                            
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
                                 contentDescription = null,
                                 tint = LightPurple,
-                                modifier = Modifier.padding(start = 4.dp)
+                                modifier = Modifier.padding(start = 8.dp)
                             )
+                                }
                         }
-                        
-                        DropdownMenu(
-                            expanded = showSortDropdown,
-                            onDismissRequest = { showSortDropdown = false },
-                            modifier = Modifier
-                                .background(SurfaceLight) // Add background to make dropdown more visible
-                        ) {
-                            SortOption(
-                                title = "Name (A-Z)",
-                                selected = currentSortOption == PersonSortOption.NAME_ASC,
-                                onClick = {
-                                    viewModel.setSortOption(PersonSortOption.NAME_ASC)
-                                    showSortDropdown = false
-                                }
-                            )
-                            
-                            SortOption(
-                                title = "Name (Z-A)",
-                                selected = currentSortOption == PersonSortOption.NAME_DESC,
-                                onClick = {
-                                    viewModel.setSortOption(PersonSortOption.NAME_DESC)
-                                    showSortDropdown = false
-                                }
-                            )
-                            
-                            SortOption(
-                                title = "Balance (High to Low)",
-                                selected = currentSortOption == PersonSortOption.BALANCE_HIGH_TO_LOW,
-                                onClick = {
-                                    viewModel.setSortOption(PersonSortOption.BALANCE_HIGH_TO_LOW)
-                                    showSortDropdown = false
-                                }
-                            )
-                            
-                            SortOption(
-                                title = "Balance (Low to High)",
-                                selected = currentSortOption == PersonSortOption.BALANCE_LOW_TO_HIGH,
-                                onClick = {
-                                    viewModel.setSortOption(PersonSortOption.BALANCE_LOW_TO_HIGH)
-                                    showSortDropdown = false
-                                }
-                            )
-                            
-                            SortOption(
-                                title = "Recently Added",
-                                selected = currentSortOption == PersonSortOption.LAST_ADDED,
-                                onClick = {
-                                    viewModel.setSortOption(PersonSortOption.LAST_ADDED)
-                                    showSortDropdown = false
-                                }
-                            )
+                    }
+                    DropdownMenu(
+                        expanded = showSortDropdown,
+                        onDismissRequest = { showSortDropdown = false },
+                        modifier = Modifier
+                                .background(CardBackground, shape = MaterialTheme.shapes.medium)
+                            .border(BorderStroke(1.dp, LightPurple.copy(alpha = 0.3f)), shape = MaterialTheme.shapes.medium)
+                            .shadow(8.dp, shape = MaterialTheme.shapes.medium)
+                    ) {
+                        SortOption(
+                            title = "Name (A-Z)",
+                            selected = currentSortOption == PersonSortOption.NAME_ASC,
+                            onClick = {
+                                viewModel.setSortOption(PersonSortOption.NAME_ASC)
+                                showSortDropdown = false
+                            }
+                        )
+                        SortOption(
+                            title = "Name (Z-A)",
+                            selected = currentSortOption == PersonSortOption.NAME_DESC,
+                            onClick = {
+                                viewModel.setSortOption(PersonSortOption.NAME_DESC)
+                                showSortDropdown = false
+                            }
+                        )
+                        SortOption(
+                            title = "Balance (High to Low)",
+                            selected = currentSortOption == PersonSortOption.BALANCE_HIGH_TO_LOW,
+                            onClick = {
+                                viewModel.setSortOption(PersonSortOption.BALANCE_HIGH_TO_LOW)
+                                showSortDropdown = false
+                            }
+                        )
+                        SortOption(
+                            title = "Balance (Low to High)",
+                            selected = currentSortOption == PersonSortOption.BALANCE_LOW_TO_HIGH,
+                            onClick = {
+                                viewModel.setSortOption(PersonSortOption.BALANCE_LOW_TO_HIGH)
+                                showSortDropdown = false
+                            }
+                        )
+                        SortOption(
+                            title = "Recently Added",
+                            selected = currentSortOption == PersonSortOption.LAST_ADDED,
+                            onClick = {
+                                viewModel.setSortOption(PersonSortOption.LAST_ADDED)
+                                showSortDropdown = false
+                            }
+                        )
                         }
                     }
                 }
@@ -471,54 +495,6 @@ fun PersonListScreen(
                 modifier = Modifier.align(Alignment.TopCenter)
             )
             
-            // Action menu bottom sheet
-            if (showActionMenu) {
-                ModalBottomSheet(
-                    onDismissRequest = { showActionMenu = false },
-                    sheetState = rememberModalBottomSheetState(),
-                    containerColor = CardBackground,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = "Actions",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = TextWhite,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        
-                        ListItem(
-                            headlineContent = { Text("Import/Export Data", color = TextWhite) },
-                            leadingContent = {
-                                Icon(
-                                    imageVector = Icons.Default.Settings,
-                                    contentDescription = null,
-                                    tint = LightPurple
-                                )
-                            },
-                            colors = ListItemDefaults.colors(
-                                containerColor = Color.Transparent,
-                                headlineColor = TextWhite,
-                                leadingIconColor = LightPurple
-                            ),
-                            modifier = Modifier
-                                .clickable {
-                                    showActionMenu = false
-                                    onImportExportClick()
-                                }
-                                .fillMaxWidth()
-                        )
-                        
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                }
-            }
-            
             // Confirmation Dialog for deleting a person
             if (showDeleteDialog && personToDelete != null) {
                 AlertDialog(
@@ -576,6 +552,7 @@ fun PersonListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PersonItem(
     person: Person,
@@ -584,6 +561,37 @@ fun PersonItem(
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val haptic = LocalHapticFeedback.current
+    val dismissState = rememberDismissState(
+        confirmStateChange = {
+            if (it == DismissValue.DismissedToStart) {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onDeleteClick()
+            }
+            false // Don't auto-dismiss, let the parent handle removal
+        }
+    )
+    SwipeToDismiss(
+        state = dismissState,
+        directions = setOf(DismissDirection.EndToStart),
+        background = {
+            val progress = dismissState.progress.fraction
+            val iconScale = 1f + 0.6f * progress.coerceIn(0f, 1f)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(end = 24.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = TextRed,
+                    modifier = Modifier.scale(iconScale)
+                )
+            }
+        },
+        dismissContent = {
     EnhancedCard(
         modifier = modifier.fillMaxWidth(),
         onClick = onPersonClick,
@@ -606,8 +614,7 @@ fun PersonItem(
                         .size(48.dp)
                         .shadow(
                             elevation = 4.dp,
-                            shape = CircleShape,
-                            spotColor = LightPurple.copy(alpha = 0.5f)
+                            shape = CircleShape
                         )
                         .clip(CircleShape)
                         .background(
@@ -627,13 +634,11 @@ fun PersonItem(
                         color = TextWhite
                     )
                 }
-                
                 Spacer(modifier = Modifier.width(16.dp))
-                
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(end = 8.dp) // Add padding to ensure ellipsis is visible
+                                .padding(end = 8.dp)
                 ) {
                     Text(
                         text = person.name,
@@ -643,9 +648,7 @@ fun PersonItem(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    
                     Spacer(modifier = Modifier.height(4.dp))
-                    
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -654,7 +657,6 @@ fun PersonItem(
                             balance < 0 -> TextRed
                             else -> TextGrey
                         }
-                        
                         Text(
                             text = when {
                                 balance > 0 -> "To Receive: "
@@ -665,7 +667,6 @@ fun PersonItem(
                             color = TextGrey,
                             maxLines = 1
                         )
-                        
                         if (balance != 0.0) {
                             Text(
                                 text = "₹${String.format("%.2f", abs(balance))}",
@@ -678,24 +679,11 @@ fun PersonItem(
                     }
                 }
             }
-            
-            IconButton(
-                onClick = onDeleteClick,
-                modifier = Modifier
-                    .size(40.dp)
-                    .semantics {
-                        contentDescription = "Delete ${person.name}"
-                        role = Role.Button
-                    }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null, // Description handled by parent
-                    tint = TextRed.copy(alpha = 0.8f)
-                )
+                    // Removed IconButton for delete
             }
         }
     }
+    )
 }
 
 @Composable
@@ -710,6 +698,14 @@ private fun SortOption(
     selected: Boolean,
     onClick: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val backgroundColor = when {
+        selected -> MediumPurple.copy(alpha = 0.15f)
+        isPressed -> LightPurple.copy(alpha = 0.10f)
+        else -> Color.Transparent
+    }
+    val border = if (selected) BorderStroke(1.dp, MediumPurple) else null
     DropdownMenuItem(
         text = {
             Row(
@@ -717,30 +713,37 @@ private fun SortOption(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        if (selected) MediumPurple.copy(alpha = 0.2f) else Color.Transparent,
-                        shape = MaterialTheme.shapes.small
+                        backgroundColor,
+                        shape = MaterialTheme.shapes.medium
                     )
-                    .padding(vertical = 4.dp)
+                    .then(if (border != null) Modifier.border(border, shape = MaterialTheme.shapes.medium) else Modifier)
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+                    .then(Modifier.clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = onClick
+                    ))
             ) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                    color = if (selected) TextWhite else TextWhite.copy(alpha = 0.9f)
+                    color = TextWhite,
+                    modifier = Modifier.weight(1f)
                 )
-                
                 if (selected) {
-                    Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
-                        tint = MediumPurple
+                        tint = MediumPurple,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
         },
         onClick = onClick,
-        modifier = Modifier.semantics {
+        modifier = Modifier
+            .semantics {
             contentDescription = "$title${if (selected) ", selected" else ""}"
         }
     )

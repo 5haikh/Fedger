@@ -334,14 +334,20 @@ fun AddPersonScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                    .padding(vertical = 4.dp),
+                    .border(
+                        width = 1.dp,
+                        color = LightPurple.copy(alpha = 0.3f),
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                shape = MaterialTheme.shapes.medium,
                 colors = ButtonDefaults.elevatedButtonColors(
                     containerColor = MediumPurple,
                     contentColor = TextWhite
                 ),
                 elevation = ButtonDefaults.elevatedButtonElevation(
                     defaultElevation = 4.dp
-                )
+                ),
+                contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,

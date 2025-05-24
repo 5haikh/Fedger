@@ -12,4 +12,16 @@ sealed class Screen(val route: String) {
     object AddTransactionGlobal : Screen("addTransactionGlobal")
     object DataImportExport : Screen("dataImportExport")
     object BalanceSummary : Screen("balanceSummary")
+    
+    object AppSelection : Screen("appSelection")
+    
+    object PasswordList : Screen("passwordList")
+    object AddPasswordEntry : Screen("addPasswordEntry")
+    object PasswordDetails : Screen("passwordDetails/{entryId}") {
+        fun createRoute(entryId: Int) = "passwordDetails/$entryId"
+    }
+    object EditPasswordEntry : Screen("editPasswordEntry/{entryId}") {
+        fun createRoute(entryId: Int) = "editPasswordEntry/$entryId"
+    }
+    object PasswordImportExport : Screen("passwordImportExport")
 }

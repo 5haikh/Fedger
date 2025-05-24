@@ -7,9 +7,9 @@ pluginManagement {
                 includeGroupByRegex("androidx.*")
             }
         }
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         mavenCentral()
         gradlePluginPortal()
+        maven { url = uri("https://plugins.gradle.org/m2/") }
     }
 }
 dependencyResolutionManagement {

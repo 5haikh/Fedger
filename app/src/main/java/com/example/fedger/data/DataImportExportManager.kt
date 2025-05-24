@@ -97,20 +97,20 @@ class DataImportExportManager(private val repository: FedgerRepository) {
                 val personIds = mutableMapOf<Int, Long>()
                 importedData.persons.forEach { person ->
                     // Store the original ID to map transactions later
-                    val newId = repository.insertPerson(person)
+                    val newId = repository.insertPerson(person.copy(id = 0)) // Let Room assign new ID
                     personIds[person.id] = newId
                 }
                 
-                // Now insert transactions, updating personId references if needed
+                // Now insert transactions, updating personId references to new IDs
                 importedData.transactions.forEach { transaction ->
-                    // If we're using the new IDs from insert, update transaction personId
-                    // Otherwise keep the original ID if not using autoincrement
-                    repository.insertTransaction(transaction)
+                    val newPersonId = personIds[transaction.personId]?.toInt() ?: transaction.personId
+                    val newTransaction = transaction.copy(personId = newPersonId)
+                    repository.insertTransaction(newTransaction)
                 }
                 
-                // Update balances for all imported persons
-                importedData.persons.forEach { person ->
-                    repository.recalculatePersonBalance(person.id)
+                // Update balances for all imported persons (using new IDs)
+                personIds.values.forEach { newId ->
+                    repository.recalculatePersonBalance(newId.toInt())
                 }
             }
             

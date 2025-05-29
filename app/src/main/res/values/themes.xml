@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Fedger" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Fedger" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- You might want to customize windowSplashScreenAnimatedIcon or other properties here if needed -->
+        <!-- For example, to set status bar color defaults if Compose isn't ready yet -->
+        <!-- <item name="android:statusBarColor">@color/your_light_status_bar_color</item> -->
+    </style>
 </resources>

@@ -33,3 +33,17 @@ val Pink80 = Color(0xFFEFB8C8)
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
+
+// Light Theme Colors
+val LightBackground = Color(0xFFFFFFFF) // White
+val LightSurface = Color(0xFFF0F0F0) // Light Gray for cards/surfaces
+val TextBlack = Color(0xFF000000) // Black for text on light backgrounds
+val TextGrayLight = Color(0xFF555555) // Darker gray for secondary text on light backgrounds
+val PrimaryLight = Color(0xFF6200EE) // Can remain the same as MediumPurple or choose a lighter variant if needed
+val OnPrimaryLight = Color(0xFFFFFFFF) // Text/icons on Primary color - likely white
+val SecondaryLight = Color(0xFF03DAC5) // Can remain the same as AccentTeal or choose a different accent
+val TertiaryLight = Color(0xFF03DAC5) // Can remain the same or choose a different accent
+val ErrorLight = Color(0xFFB00020) // Standard error color for light themes
+val OnErrorLight = Color(0xFFFFFFFF) // Text/icons on Error color
+val SurfaceVariantLight = Color(0xFFE0E0E0)
+val OnSurfaceVariantLight = Color(0xFF424242)

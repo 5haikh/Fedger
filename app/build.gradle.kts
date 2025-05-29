@@ -112,6 +112,9 @@ dependencies {
     
     // Gson for JSON serialization/deserialization
     implementation("com.google.code.gson:gson:2.10.1")
+
+    // DataStore Preferences
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
     
     // Accompanist for permissions handling
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")

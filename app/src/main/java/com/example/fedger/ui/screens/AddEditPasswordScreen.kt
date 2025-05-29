@@ -32,6 +32,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -43,7 +45,6 @@ import com.example.fedger.model.CredentialType
 import com.example.fedger.model.PasswordEntry
 import com.example.fedger.ui.PasswordViewModel
 import com.example.fedger.ui.components.EnhancedCard
-import com.example.fedger.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -155,24 +156,25 @@ fun AddEditPasswordScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     Text(
                         text = if (isEditMode) "Edit Password" else "Add Password",
-                        color = TextWhite,
+                        color = MaterialTheme.colorScheme.onPrimary, // Changed
                         fontWeight = FontWeight.Bold
-                    ) 
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DeepPurple,
-                    titleContentColor = TextWhite,
-                    actionIconContentColor = TextWhite
+                    containerColor = MaterialTheme.colorScheme.primary, // Changed
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary, // Changed
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary, // Changed
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary // Changed for navigation icon
                 ),
                 navigationIcon = {
                     IconButton(onClick = onCancelClick) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Cancel",
-                            tint = TextWhite
+                            tint = MaterialTheme.colorScheme.onPrimary // Changed
                         )
                     }
                 }
@@ -182,7 +184,7 @@ fun AddEditPasswordScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(DeepPurple)
+                .background(MaterialTheme.colorScheme.background) // Changed
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -197,7 +199,7 @@ fun AddEditPasswordScreen(
                         text = "Password Details",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = TextWhite
+                        color = MaterialTheme.colorScheme.onBackground // Changed
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     
@@ -205,18 +207,18 @@ fun AddEditPasswordScreen(
                     OutlinedTextField(
                         value = title,
                         onValueChange = { title = it },
-                        label = { Text("Title", color = TextGrey) },
+                        label = { Text("Title", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextWhite,
-                            unfocusedTextColor = TextWhite,
-                            focusedContainerColor = SurfaceLight,
-                            unfocusedContainerColor = SurfaceLight,
-                            focusedBorderColor = MediumPurple,
-                            unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                            cursorColor = MediumPurple
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                            cursorColor = MaterialTheme.colorScheme.primary // Changed
                         )
                     )
                     
@@ -226,17 +228,17 @@ fun AddEditPasswordScreen(
                     OutlinedTextField(
                         value = description,
                         onValueChange = { description = it },
-                        label = { Text("Description (Optional)", color = TextGrey) },
+                        label = { Text("Description (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextWhite,
-                            unfocusedTextColor = TextWhite,
-                            focusedContainerColor = SurfaceLight,
-                            unfocusedContainerColor = SurfaceLight,
-                            focusedBorderColor = MediumPurple,
-                            unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                            cursorColor = MediumPurple
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                            cursorColor = MaterialTheme.colorScheme.primary // Changed
                         )
                     )
                     
@@ -246,18 +248,18 @@ fun AddEditPasswordScreen(
                     OutlinedTextField(
                         value = category,
                         onValueChange = { category = it },
-                        label = { Text("Category (Optional)", color = TextGrey) },
+                        label = { Text("Category (Optional)", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextWhite,
-                            unfocusedTextColor = TextWhite,
-                            focusedContainerColor = SurfaceLight,
-                            unfocusedContainerColor = SurfaceLight,
-                            focusedBorderColor = MediumPurple,
-                            unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                            cursorColor = MediumPurple
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                            cursorColor = MaterialTheme.colorScheme.primary // Changed
                         )
                     )
                     
@@ -273,7 +275,7 @@ fun AddEditPasswordScreen(
                             text = "Credentials",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = TextWhite
+                            color = MaterialTheme.colorScheme.onBackground // Changed
                         )
                         
                         ElevatedButton(
@@ -286,8 +288,8 @@ fun AddEditPasswordScreen(
                                 )
                             },
                             colors = ButtonDefaults.elevatedButtonColors(
-                                containerColor = MediumPurple,
-                                contentColor = TextWhite
+                                containerColor = MaterialTheme.colorScheme.primary, // Changed
+                                contentColor = MaterialTheme.colorScheme.onPrimary // Changed
                             ),
                             elevation = ButtonDefaults.elevatedButtonElevation(
                                 defaultElevation = 2.dp
@@ -296,9 +298,9 @@ fun AddEditPasswordScreen(
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Add, 
+                                imageVector = Icons.Default.Add,
                                 contentDescription = "Add Credential",
-                                tint = TextWhite
+                                tint = MaterialTheme.colorScheme.onPrimary // Changed
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
@@ -348,7 +350,7 @@ fun AddEditPasswordScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .background(DeepPurple)
+                    .background(MaterialTheme.colorScheme.background) // Changed
                     .padding(16.dp)
             ) {
                 ElevatedButton(
@@ -399,15 +401,15 @@ fun AddEditPasswordScreen(
                         .height(56.dp)
                         .border(
                             width = 1.dp,
-                            color = LightPurple.copy(alpha = 0.3f),
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Changed
                             shape = MaterialTheme.shapes.medium
                         ),
                     shape = MaterialTheme.shapes.medium,
                     colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = MediumPurple,
-                        contentColor = TextWhite,
-                        disabledContainerColor = MediumPurple.copy(alpha = 0.5f),
-                        disabledContentColor = TextWhite.copy(alpha = 0.7f)
+                        containerColor = MaterialTheme.colorScheme.primary, // Changed
+                        contentColor = MaterialTheme.colorScheme.onPrimary, // Changed
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), // Changed
+                        disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f) // Changed
                     ),
                     elevation = ButtonDefaults.elevatedButtonElevation(
                         defaultElevation = 4.dp
@@ -417,7 +419,7 @@ fun AddEditPasswordScreen(
                     Icon(
                         imageVector = Icons.Default.Save,
                         contentDescription = "Save",
-                        tint = TextWhite
+                        tint = MaterialTheme.colorScheme.onPrimary // Changed
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -503,21 +505,21 @@ fun CredentialItemNew(
                     value = localState.type.displayName,
                     onValueChange = {}, // Read-only field
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Field Type", color = TextGrey) },
+                    label = { Text("Field Type", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                     readOnly = true,
                     enabled = false,
                     colors = OutlinedTextFieldDefaults.colors(
-                        disabledTextColor = TextWhite,
-                        disabledContainerColor = SurfaceLight,
-                        disabledBorderColor = LightPurple.copy(alpha = 0.5f),
-                        disabledLabelColor = TextGrey
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                     ),
                     trailingIcon = {
                         Icon(
                             Icons.Default.ArrowDropDown,
                             contentDescription = "Select Type",
                             modifier = Modifier.clickable { typeMenuExpanded = true },
-                            tint = TextWhite
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                         )
                     }
                 )
@@ -532,7 +534,7 @@ fun CredentialItemNew(
                 DropdownMenu(
                     expanded = typeMenuExpanded,
                     onDismissRequest = { typeMenuExpanded = false },
-                    modifier = Modifier.background(SurfaceDark)
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)) // Changed
                 ) {
                     credentialTypes.forEach { typeName ->
                         DropdownMenuItem(
@@ -557,7 +559,7 @@ fun CredentialItemNew(
                                 updateLocalAndParent(updatedState)
                                 typeMenuExpanded = false
                             },
-                            text = { Text(typeName, color = TextWhite) }
+                            text = { Text(typeName, color = MaterialTheme.colorScheme.onSurface) } // Changed
                         )
                     }
                 }
@@ -568,10 +570,10 @@ fun CredentialItemNew(
             // Custom display name field
             OutlinedTextField(
                 value = localState.displayName,
-                onValueChange = { 
+                onValueChange = {
                     updateLocalAndParent(localState.copy(displayName = it))
                 },
-                label = { Text("Display Name (optional)", color = TextGrey) },
+                label = { Text("Display Name (optional)", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                 modifier = Modifier
                     .fillMaxWidth()
                     .onFocusChanged { focusState ->
@@ -583,15 +585,15 @@ fun CredentialItemNew(
                     onNext = { focusManager.moveFocus(FocusDirection.Down) }
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = TextWhite,
-                    unfocusedTextColor = TextWhite,
-                    focusedContainerColor = SurfaceLight,
-                    unfocusedContainerColor = SurfaceLight,
-                    focusedBorderColor = MediumPurple,
-                    unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                    cursorColor = MediumPurple
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                    focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                    cursorColor = MaterialTheme.colorScheme.primary // Changed
                 ),
-                placeholder = { Text("Custom name for this credential field", color = TextGrey.copy(alpha = 0.5f)) }
+                placeholder = { Text("Custom name for this credential field", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) } // Changed
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -602,66 +604,66 @@ fun CredentialItemNew(
                     // Username field
                     OutlinedTextField(
                         value = localState.username,
-                        onValueChange = { 
+                        onValueChange = {
                             updateLocalAndParent(localState.copy(username = it))
                         },
-                        label = { Text("Username", color = TextGrey) },
+                        label = { Text("Username", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextWhite,
-                            unfocusedTextColor = TextWhite,
-                            focusedContainerColor = SurfaceLight,
-                            unfocusedContainerColor = SurfaceLight,
-                            focusedBorderColor = MediumPurple,
-                            unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                            cursorColor = MediumPurple
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                            cursorColor = MaterialTheme.colorScheme.primary // Changed
                         )
                     )
                     
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    // Password field 
+                    // Password field
                     OutlinedTextField(
                         value = localState.value,
-                        onValueChange = { 
+                        onValueChange = {
                             updateLocalAndParent(localState.copy(value = it))
                         },
-                        label = { Text("Password", color = TextGrey) },
+                        label = { Text("Password", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        visualTransformation = if (!localState.isProtected || showPassword) 
-                            VisualTransformation.None 
-                        else 
+                        visualTransformation = if (!localState.isProtected || showPassword)
+                            VisualTransformation.None
+                        else
                             PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Done
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextWhite,
-                            unfocusedTextColor = TextWhite,
-                            focusedContainerColor = SurfaceLight,
-                            unfocusedContainerColor = SurfaceLight,
-                            focusedBorderColor = MediumPurple,
-                            unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                            cursorColor = MediumPurple
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                            cursorColor = MaterialTheme.colorScheme.primary // Changed
                         ),
                         trailingIcon = {
                             IconButton(onClick = { showPassword = !showPassword }) {
                                 Icon(
-                                    imageVector = if (showPassword) 
-                                        Icons.Default.Visibility 
-                                    else 
+                                    imageVector = if (showPassword)
+                                        Icons.Default.Visibility
+                                    else
                                         Icons.Default.VisibilityOff,
-                                    contentDescription = if (showPassword) 
-                                        "Hide Password" 
-                                    else 
+                                    contentDescription = if (showPassword)
+                                        "Hide Password"
+                                    else
                                         "Show Password",
-                                    tint = LightPurple
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             }
                         }
@@ -671,44 +673,44 @@ fun CredentialItemNew(
                     // PIN field
                     OutlinedTextField(
                         value = localState.value,
-                        onValueChange = { 
+                        onValueChange = {
                             // Only allow digits for PIN
                             if (it.all { char -> char.isDigit() }) {
                                 updateLocalAndParent(localState.copy(value = it))
                             }
                         },
-                        label = { Text("PIN", color = TextGrey) },
+                        label = { Text("PIN", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        visualTransformation = if (!localState.isProtected || showPassword) 
-                            VisualTransformation.None 
-                        else 
+                        visualTransformation = if (!localState.isProtected || showPassword)
+                            VisualTransformation.None
+                        else
                             PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.NumberPassword,
                             imeAction = ImeAction.Done
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextWhite,
-                            unfocusedTextColor = TextWhite,
-                            focusedContainerColor = SurfaceLight,
-                            unfocusedContainerColor = SurfaceLight,
-                            focusedBorderColor = MediumPurple,
-                            unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                            cursorColor = MediumPurple
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                            cursorColor = MaterialTheme.colorScheme.primary // Changed
                         ),
                         trailingIcon = {
                             IconButton(onClick = { showPassword = !showPassword }) {
                                 Icon(
-                                    imageVector = if (showPassword) 
-                                        Icons.Default.Visibility 
-                                    else 
+                                    imageVector = if (showPassword)
+                                        Icons.Default.Visibility
+                                    else
                                         Icons.Default.VisibilityOff,
-                                    contentDescription = if (showPassword) 
-                                        "Hide PIN" 
-                                    else 
+                                    contentDescription = if (showPassword)
+                                        "Hide PIN"
+                                    else
                                         "Show PIN",
-                                    tint = LightPurple
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             }
                         }
@@ -718,41 +720,41 @@ fun CredentialItemNew(
                     // Password only field
                     OutlinedTextField(
                         value = localState.value,
-                        onValueChange = { 
+                        onValueChange = {
                             updateLocalAndParent(localState.copy(value = it))
                         },
-                        label = { Text("Password", color = TextGrey) },
+                        label = { Text("Password", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        visualTransformation = if (!localState.isProtected || showPassword) 
-                            VisualTransformation.None 
-                        else 
+                        visualTransformation = if (!localState.isProtected || showPassword)
+                            VisualTransformation.None
+                        else
                             PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Done
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextWhite,
-                            unfocusedTextColor = TextWhite,
-                            focusedContainerColor = SurfaceLight,
-                            unfocusedContainerColor = SurfaceLight,
-                            focusedBorderColor = MediumPurple,
-                            unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                            cursorColor = MediumPurple
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                            cursorColor = MaterialTheme.colorScheme.primary // Changed
                         ),
                         trailingIcon = {
                             IconButton(onClick = { showPassword = !showPassword }) {
                                 Icon(
-                                    imageVector = if (showPassword) 
-                                        Icons.Default.Visibility 
-                                    else 
+                                    imageVector = if (showPassword)
+                                        Icons.Default.Visibility
+                                    else
                                         Icons.Default.VisibilityOff,
-                                    contentDescription = if (showPassword) 
-                                        "Hide Password" 
-                                    else 
+                                    contentDescription = if (showPassword)
+                                        "Hide Password"
+                                    else
                                         "Show Password",
-                                    tint = LightPurple
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             }
                         }
@@ -762,21 +764,21 @@ fun CredentialItemNew(
                     // Label field
                     OutlinedTextField(
                         value = localState.label,
-                        onValueChange = { 
+                        onValueChange = {
                             updateLocalAndParent(localState.copy(label = it))
                         },
-                        label = { Text("Label", color = TextGrey) },
+                        label = { Text("Label", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextWhite,
-                            unfocusedTextColor = TextWhite,
-                            focusedContainerColor = SurfaceLight,
-                            unfocusedContainerColor = SurfaceLight,
-                            focusedBorderColor = MediumPurple,
-                            unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                            cursorColor = MediumPurple
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                            cursorColor = MaterialTheme.colorScheme.primary // Changed
                         )
                     )
                     
@@ -785,40 +787,40 @@ fun CredentialItemNew(
                     // Value field
                     OutlinedTextField(
                         value = localState.value,
-                        onValueChange = { 
+                        onValueChange = {
                             updateLocalAndParent(localState.copy(value = it))
                         },
-                        label = { Text("Value", color = TextGrey) },
+                        label = { Text("Value", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        visualTransformation = if (!localState.isProtected || showPassword) 
-                            VisualTransformation.None 
-                        else 
+                        visualTransformation = if (!localState.isProtected || showPassword)
+                            VisualTransformation.None
+                        else
                             PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Done
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = TextWhite,
-                            unfocusedTextColor = TextWhite,
-                            focusedContainerColor = SurfaceLight,
-                            unfocusedContainerColor = SurfaceLight,
-                            focusedBorderColor = MediumPurple,
-                            unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                            cursorColor = MediumPurple
+                            focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                            focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                            cursorColor = MaterialTheme.colorScheme.primary // Changed
                         ),
                         trailingIcon = {
                             IconButton(onClick = { showPassword = !showPassword }) {
                                 Icon(
-                                    imageVector = if (showPassword) 
-                                        Icons.Default.Visibility 
-                                    else 
+                                    imageVector = if (showPassword)
+                                        Icons.Default.Visibility
+                                    else
                                         Icons.Default.VisibilityOff,
-                                    contentDescription = if (showPassword) 
-                                        "Hide Value" 
-                                    else 
+                                    contentDescription = if (showPassword)
+                                        "Hide Value"
+                                    else
                                         "Show Value",
-                                    tint = LightPurple
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             }
                         }
@@ -835,16 +837,16 @@ fun CredentialItemNew(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Checkbox(
                         checked = localState.isProtected,
-                        onCheckedChange = { 
+                        onCheckedChange = {
                             updateLocalAndParent(localState.copy(isProtected = it))
                         },
                         colors = CheckboxDefaults.colors(
-                            checkedColor = MediumPurple,
-                            uncheckedColor = LightPurple,
-                            checkmarkColor = TextWhite
+                            checkedColor = MaterialTheme.colorScheme.primary, // Changed
+                            uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
+                            checkmarkColor = MaterialTheme.colorScheme.onPrimary // Changed
                         )
                     )
-                    Text("Mask value", color = TextWhite)
+                    Text("Mask value", color = MaterialTheme.colorScheme.onSurface) // Changed
                 }
                 
                 if (totalCredentials > 1) {
@@ -852,21 +854,21 @@ fun CredentialItemNew(
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Remove Credential",
-                            tint = TextRed
+                            tint = MaterialTheme.colorScheme.error // Changed
                         )
                     }
                 }
             }
             
             // Password generator button - only show for password fields
-            if (localState.type == CredentialType.USERNAME_PASSWORD || 
+            if (localState.type == CredentialType.USERNAME_PASSWORD ||
                 localState.type == CredentialType.PASSWORD_ONLY) {
                 ElevatedButton(
                     onClick = { showGenerator = !showGenerator },
                     modifier = Modifier.align(Alignment.End),
                     colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = MediumPurple.copy(alpha = 0.8f),
-                        contentColor = TextWhite
+                        containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f), // Changed
+                        contentColor = MaterialTheme.colorScheme.onSecondary // Changed
                     ),
                     elevation = ButtonDefaults.elevatedButtonElevation(
                         defaultElevation = 2.dp
@@ -877,7 +879,7 @@ fun CredentialItemNew(
                     Icon(
                         imageVector = Icons.Default.Password,
                         contentDescription = "Generate Password",
-                        tint = TextWhite
+                        tint = MaterialTheme.colorScheme.onSecondary // Changed
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
@@ -913,42 +915,42 @@ fun PasswordField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label, color = TextGrey) },
+        label = { Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
         modifier = Modifier
             .fillMaxWidth()
-            .onFocusChanged { 
-                onFocusChange(!it.isFocused) 
+            .onFocusChanged {
+                onFocusChange(!it.isFocused)
             },
         singleLine = true,
-        visualTransformation = if (!isProtected || showPassword) 
-            VisualTransformation.None 
-        else 
+        visualTransformation = if (!isProtected || showPassword)
+            VisualTransformation.None
+        else
             PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done
         ),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = TextWhite,
-            unfocusedTextColor = TextWhite,
-            focusedContainerColor = SurfaceLight,
-            unfocusedContainerColor = SurfaceLight,
-            focusedBorderColor = MediumPurple,
-            unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-            cursorColor = MediumPurple
+            focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+            unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+            focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+            cursorColor = MaterialTheme.colorScheme.primary // Changed
         ),
         trailingIcon = {
             IconButton(onClick = { onToggleShowPassword(!showPassword) }) {
                 Icon(
-                    imageVector = if (showPassword) 
-                        Icons.Default.Visibility 
-                    else 
+                    imageVector = if (showPassword)
+                        Icons.Default.Visibility
+                    else
                         Icons.Default.VisibilityOff,
-                    contentDescription = if (showPassword) 
-                        "Hide Password" 
-                    else 
+                    contentDescription = if (showPassword)
+                        "Hide Password"
+                    else
                         "Show Password",
-                    tint = LightPurple
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                 )
             }
         }
@@ -977,7 +979,7 @@ fun PasswordGeneratorDialog(
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = MaterialTheme.shapes.medium,
-            color = SurfaceDark,
+            color = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp), // Changed
             tonalElevation = 8.dp,
             modifier = Modifier
                 .fillMaxWidth()
@@ -997,13 +999,13 @@ fun PasswordGeneratorDialog(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(MediumPurple),
+                            .background(MaterialTheme.colorScheme.primary), // Changed
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Password,
                             contentDescription = null,
-                            tint = TextWhite,
+                            tint = MaterialTheme.colorScheme.onPrimary, // Changed
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -1014,7 +1016,7 @@ fun PasswordGeneratorDialog(
                         text = "Password Generator",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = TextWhite
+                        color = MaterialTheme.colorScheme.onSurface // Changed
                     )
                 }
                 
@@ -1025,7 +1027,7 @@ fun PasswordGeneratorDialog(
                     text = "Generated Password",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = MediumPurple
+                    color = MaterialTheme.colorScheme.primary // Changed
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -1039,10 +1041,10 @@ fun PasswordGeneratorDialog(
                         modifier = Modifier
                             .weight(1f)
                             .clip(MaterialTheme.shapes.small)
-                            .background(SurfaceLight.copy(alpha = 0.3f))
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)) // Changed
                             .border(
                                 width = 1.dp,
-                                color = MediumPurple.copy(alpha = 0.5f),
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), // Changed
                                 shape = MaterialTheme.shapes.small
                             )
                             .padding(vertical = 12.dp, horizontal = 16.dp)
@@ -1052,7 +1054,7 @@ fun PasswordGeneratorDialog(
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium,
                             fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                            color = TextWhite
+                            color = MaterialTheme.colorScheme.onSurface // Changed
                         )
                     }
                     
@@ -1064,12 +1066,12 @@ fun PasswordGeneratorDialog(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(MediumPurple)
+                            .background(MaterialTheme.colorScheme.primary) // Changed
                     ) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Generate New Password",
-                            tint = TextWhite
+                            tint = MaterialTheme.colorScheme.onPrimary // Changed
                         )
                     }
                 }
@@ -1084,7 +1086,7 @@ fun PasswordGeneratorDialog(
                     Icon(
                         imageVector = Icons.Default.LinearScale,
                         contentDescription = null,
-                        tint = MediumPurple,
+                        tint = MaterialTheme.colorScheme.primary, // Changed
                         modifier = Modifier.size(16.dp)
                     )
                     
@@ -1093,7 +1095,7 @@ fun PasswordGeneratorDialog(
                     Text(
                         text = "Password Length: $passwordLength",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextWhite
+                        color = MaterialTheme.colorScheme.onSurface // Changed
                     )
                 }
                 
@@ -1104,14 +1106,14 @@ fun PasswordGeneratorDialog(
                     Text(
                         text = "8",
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextGrey,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
                         modifier = Modifier.align(Alignment.CenterStart)
                     )
                     
                     Text(
                         text = "32",
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextGrey,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
                         modifier = Modifier.align(Alignment.CenterEnd)
                     )
                 }
@@ -1123,9 +1125,9 @@ fun PasswordGeneratorDialog(
                     steps = 23,
                     modifier = Modifier.fillMaxWidth(),
                     colors = SliderDefaults.colors(
-                        thumbColor = MediumPurple,
-                        activeTrackColor = MediumPurple,
-                        inactiveTrackColor = TextGrey.copy(alpha = 0.3f)
+                        thumbColor = MaterialTheme.colorScheme.primary, // Changed
+                        activeTrackColor = MaterialTheme.colorScheme.primary, // Changed
+                        inactiveTrackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f) // Changed
                     )
                 )
                 
@@ -1139,7 +1141,7 @@ fun PasswordGeneratorDialog(
                     Icon(
                         imageVector = Icons.Default.TextFields,
                         contentDescription = null,
-                        tint = MediumPurple,
+                        tint = MaterialTheme.colorScheme.primary, // Changed
                         modifier = Modifier.size(16.dp)
                     )
                     
@@ -1148,7 +1150,7 @@ fun PasswordGeneratorDialog(
                     Text(
                         text = "Character Types",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextWhite
+                        color = MaterialTheme.colorScheme.onSurface // Changed
                     )
                 }
                 
@@ -1157,7 +1159,7 @@ fun PasswordGeneratorDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(MaterialTheme.shapes.small)
-                        .background(SurfaceLight.copy(alpha = 0.3f))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)) // Changed
                         .padding(12.dp)
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1172,20 +1174,20 @@ fun PasswordGeneratorDialog(
                                 checked = useUppercase,
                                 onCheckedChange = { viewModel.setUseUppercase(it) },
                                 colors = CheckboxDefaults.colors(
-                                    checkedColor = MediumPurple,
-                                    uncheckedColor = TextGrey
+                                    checkedColor = MaterialTheme.colorScheme.primary, // Changed
+                                    uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             )
                             
                             Text(
-                                "Uppercase (A-Z)", 
-                                color = TextWhite,
+                                "Uppercase (A-Z)",
+                                color = MaterialTheme.colorScheme.onSurface, // Changed
                                 modifier = Modifier.weight(1f)
                             )
                             
                             Text(
-                                "ABCDEF", 
-                                color = MediumPurple,
+                                "ABCDEF",
+                                color = MaterialTheme.colorScheme.primary, // Changed
                                 fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -1202,20 +1204,20 @@ fun PasswordGeneratorDialog(
                                 checked = useLowercase,
                                 onCheckedChange = { viewModel.setUseLowercase(it) },
                                 colors = CheckboxDefaults.colors(
-                                    checkedColor = MediumPurple,
-                                    uncheckedColor = TextGrey
+                                    checkedColor = MaterialTheme.colorScheme.primary, // Changed
+                                    uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             )
                             
                             Text(
-                                "Lowercase (a-z)", 
-                                color = TextWhite,
+                                "Lowercase (a-z)",
+                                color = MaterialTheme.colorScheme.onSurface, // Changed
                                 modifier = Modifier.weight(1f)
                             )
                             
                             Text(
-                                "abcdef", 
-                                color = MediumPurple,
+                                "abcdef",
+                                color = MaterialTheme.colorScheme.primary, // Changed
                                 fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -1232,20 +1234,20 @@ fun PasswordGeneratorDialog(
                                 checked = useNumbers,
                                 onCheckedChange = { viewModel.setUseNumbers(it) },
                                 colors = CheckboxDefaults.colors(
-                                    checkedColor = MediumPurple,
-                                    uncheckedColor = TextGrey
+                                    checkedColor = MaterialTheme.colorScheme.primary, // Changed
+                                    uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             )
                             
                             Text(
-                                "Numbers (0-9)", 
-                                color = TextWhite,
+                                "Numbers (0-9)",
+                                color = MaterialTheme.colorScheme.onSurface, // Changed
                                 modifier = Modifier.weight(1f)
                             )
                             
                             Text(
-                                "012345", 
-                                color = MediumPurple,
+                                "012345",
+                                color = MaterialTheme.colorScheme.primary, // Changed
                                 fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -1262,20 +1264,20 @@ fun PasswordGeneratorDialog(
                                 checked = useSpecialChars,
                                 onCheckedChange = { viewModel.setUseSpecialChars(it) },
                                 colors = CheckboxDefaults.colors(
-                                    checkedColor = MediumPurple,
-                                    uncheckedColor = TextGrey
+                                    checkedColor = MaterialTheme.colorScheme.primary, // Changed
+                                    uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             )
                             
                             Text(
-                                "Special characters", 
-                                color = TextWhite,
+                                "Special characters",
+                                color = MaterialTheme.colorScheme.onSurface, // Changed
                                 modifier = Modifier.weight(1f)
                             )
                             
                             Text(
-                                "!@#$%&", 
-                                color = MediumPurple,
+                                "!@#$%&",
+                                color = MaterialTheme.colorScheme.primary, // Changed
                                 fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
                                 style = MaterialTheme.typography.bodySmall
                             )
@@ -1296,28 +1298,28 @@ fun PasswordGeneratorDialog(
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
                             containerColor = Color.Transparent,
-                            contentColor = TextWhite
+                            contentColor = MaterialTheme.colorScheme.onSurface // Changed
                         ),
-                        border = BorderStroke(1.dp, MediumPurple.copy(alpha = 0.3f))
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)) // Changed
                     ) {
                         Text("Cancel")
                     }
                     
                     // Use button with checkmark icon
                     Button(
-                        onClick = { 
+                        onClick = {
                             onPasswordGenerated(generatedPassword)
                             onDismiss()
                         },
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MediumPurple
+                            containerColor = MaterialTheme.colorScheme.primary // Changed
                         )
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = null,
-                            tint = TextWhite
+                            tint = MaterialTheme.colorScheme.onPrimary // Changed
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Use")
@@ -1326,4 +1328,4 @@ fun PasswordGeneratorDialog(
             }
         }
     }
-} 
+}

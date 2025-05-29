@@ -84,17 +84,11 @@ import androidx.compose.ui.zIndex
 import com.example.fedger.model.Person
 import com.example.fedger.model.Transaction
 import com.example.fedger.ui.PersonViewModel
-import com.example.fedger.ui.theme.MediumPurple
-import com.example.fedger.ui.theme.TextRed
-import com.example.fedger.ui.theme.TextWhite
-import com.example.fedger.ui.theme.CardBackground
-import com.example.fedger.ui.theme.HighContrastGrey
-import com.example.fedger.ui.theme.PurpleHighlight
-import com.example.fedger.ui.theme.DeepPurple
-import com.example.fedger.ui.theme.LightPurple
+// import com.example.fedger.ui.theme.* // Removed direct theme imports
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material3.TopAppBarDefaults // Added for TopAppBar colors
 import kotlin.math.abs
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -227,14 +221,15 @@ fun PersonDetailsScreen(
                                 .size(44.dp)
                                 .shadow(
                                     elevation = 6.dp,
-                                    shape = CircleShape
+                                    shape = CircleShape,
+                                    spotColor = MaterialTheme.colorScheme.secondary // Added spotColor for consistency
                                 )
                                 .clip(CircleShape)
                                 .background(
                                     brush = Brush.radialGradient(
                                         colors = listOf(
-                                            MediumPurple,
-                                            MediumPurple.copy(alpha = 0.9f)
+                                            MaterialTheme.colorScheme.primary, // Changed
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.9f) // Changed
                                         )
                                     )
                                 ),
@@ -242,7 +237,7 @@ fun PersonDetailsScreen(
                         ) {
                             Text(
                                 text = "₹",
-                                color = TextWhite,
+                                color = MaterialTheme.colorScheme.onPrimary, // Changed
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -251,7 +246,7 @@ fun PersonDetailsScreen(
                         Text(
                             text = "Fedger",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = TextWhite,
+                            color = MaterialTheme.colorScheme.onPrimary, // Changed
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -266,13 +261,14 @@ fun PersonDetailsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
-                            tint = TextWhite
+                            tint = MaterialTheme.colorScheme.onPrimary // Changed
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DeepPurple,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                    containerColor = MaterialTheme.colorScheme.primary, // Changed
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary, // Changed
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary // Changed
                 ),
                 actions = {
                     // App Switcher removed as requested
@@ -284,6 +280,7 @@ fun PersonDetailsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .background(MaterialTheme.colorScheme.background) // Added background
                 .pullRefresh(pullRefreshState)
         ) {
             Column(
@@ -294,7 +291,7 @@ fun PersonDetailsScreen(
                 Text(
                     text = "Person Details",
                     style = MaterialTheme.typography.headlineMedium,
-                    color = TextWhite,
+                    color = MaterialTheme.colorScheme.onBackground, // Changed
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                 )
@@ -318,15 +315,15 @@ fun PersonDetailsScreen(
                     Text(
                         text = "Transactions",
                         style = MaterialTheme.typography.titleLarge,
-                        color = TextWhite,
+                        color = MaterialTheme.colorScheme.onBackground, // Changed
                         fontWeight = FontWeight.Bold
                     )
                     
                     Text(
-                        text = if (totalTransactionCount > 0) 
-                            "${totalTransactionCount} ${if (totalTransactionCount == 1) "transaction" else "transactions"}" 
+                        text = if (totalTransactionCount > 0)
+                            "${totalTransactionCount} ${if (totalTransactionCount == 1) "transaction" else "transactions"}"
                         else "",
-                        color = TextWhite.copy(alpha = 0.6f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f), // Changed
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -400,8 +397,8 @@ fun PersonDetailsScreen(
                 refreshing = refreshingTransactions,
                 state = pullRefreshState,
                 modifier = Modifier.align(Alignment.TopCenter),
-                backgroundColor = CardBackground,
-                contentColor = MediumPurple
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                contentColor = MaterialTheme.colorScheme.primary // Changed
             )
             
             // Show delete transaction confirmation dialog
@@ -409,17 +406,17 @@ fun PersonDetailsScreen(
                 val context = LocalContext.current
                 
                 AlertDialog(
-                    onDismissRequest = { 
-                        showDeleteDialog = false 
+                    onDismissRequest = {
+                        showDeleteDialog = false
                         transactionToDelete = null
                     },
-                    title = { Text("Delete Transaction", color = TextWhite) },
-                    text = { 
+                    title = { Text("Delete Transaction", color = MaterialTheme.colorScheme.onSurface) }, // Changed
+                    text = {
                         Text(
                             "Are you sure you want to delete this transaction?",
-                            color = HighContrastGrey,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
                             style = MaterialTheme.typography.bodyMedium
-                        ) 
+                        )
                     },
                     confirmButton = {
                         TextButton(
@@ -450,7 +447,7 @@ fun PersonDetailsScreen(
                                 transactionToDelete = null
                             }
                         ) {
-                            Text("Delete", color = TextRed)
+                            Text("Delete", color = MaterialTheme.colorScheme.error) // Changed
                         }
                     },
                     dismissButton = {
@@ -460,10 +457,10 @@ fun PersonDetailsScreen(
                                 transactionToDelete = null
                             }
                         ) {
-                            Text("Cancel", color = TextWhite)
+                            Text("Cancel", color = MaterialTheme.colorScheme.onSurface) // Changed
                         }
                     },
-                    containerColor = CardBackground
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) // Changed
                 )
             }
         }
@@ -495,7 +492,7 @@ fun PersonInfoCard(
                     Text(
                         text = person.name,
                         style = MaterialTheme.typography.headlineMedium,
-                        color = TextWhite,
+                        color = MaterialTheme.colorScheme.onSurface, // Changed
                         fontWeight = FontWeight.Bold
                     )
                     
@@ -504,19 +501,22 @@ fun PersonInfoCard(
                     Text(
                         text = person.phoneNumber,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = TextWhite.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f) // Changed
                     )
                 }
                 
                 Button(
                     onClick = onAddTransactionClick,
-                    colors = ButtonDefaults.buttonColors(containerColor = MediumPurple, contentColor = TextWhite),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary, // Changed
+                        contentColor = MaterialTheme.colorScheme.onPrimary // Changed
+                    ),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
                     modifier = Modifier
                         .height(56.dp)
                         .border(
                             width = 1.dp,
-                            color = LightPurple.copy(alpha = 0.3f),
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Changed
                             shape = MaterialTheme.shapes.medium
                         )
                         .semantics {
@@ -527,20 +527,20 @@ fun PersonInfoCard(
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add Transaction",
-                        tint = TextWhite
+                        tint = MaterialTheme.colorScheme.onPrimary // Changed
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Add Transaction", color = TextWhite)
+                    Text("Add Transaction", color = MaterialTheme.colorScheme.onPrimary) // Changed
                 }
             }
             
             Spacer(modifier = Modifier.height(16.dp))
             
             // Balance section with gradient background
-            GradientSurface(
+            GradientSurface( // GradientSurface itself now uses themed colors by default
                 modifier = Modifier.fillMaxWidth(),
-                startColor = CardBackground.copy(alpha = 0.5f),
-                endColor = CardBackground.copy(alpha = 0.3f)
+                startColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), // Example themed gradient
+                endColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)   // Example themed gradient
             ) {
                 Column(
                     modifier = Modifier
@@ -554,7 +554,7 @@ fun PersonInfoCard(
                         Text(
                             text = "Current Balance",
                             style = MaterialTheme.typography.titleMedium,
-                            color = TextWhite.copy(alpha = 0.8f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f) // Changed
                         )
                         
                         val balanceText = when {
@@ -567,9 +567,9 @@ fun PersonInfoCard(
                             text = balanceText,
                             style = MaterialTheme.typography.titleMedium,
                             color = when {
-                                balance > 0 -> Color.Green.copy(alpha = 0.8f)
-                                balance < 0 -> TextRed
-                                else -> TextWhite.copy(alpha = 0.8f)
+                                balance > 0 -> MaterialTheme.colorScheme.tertiary // Changed
+                                balance < 0 -> MaterialTheme.colorScheme.error // Changed
+                                else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f) // Changed
                             }
                         )
                     }
@@ -580,9 +580,9 @@ fun PersonInfoCard(
                         text = if (balance == 0.0) "₹0.00" else "₹${String.format("%.2f", abs(balance))}",
                         style = MaterialTheme.typography.headlineLarge,
                         color = when {
-                            balance > 0 -> Color.Green.copy(alpha = 0.8f)
-                            balance < 0 -> TextRed
-                            else -> TextWhite
+                            balance > 0 -> MaterialTheme.colorScheme.tertiary // Changed
+                            balance < 0 -> MaterialTheme.colorScheme.error // Changed
+                            else -> MaterialTheme.colorScheme.onSurface // Changed
                         },
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.align(Alignment.End)
@@ -599,7 +599,7 @@ fun PersonInfoCard(
                 TextButton(
                     onClick = { /* Keep this empty until viewModel is available */ },
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = LightPurple
+                        contentColor = MaterialTheme.colorScheme.secondary // Changed
                     ),
                     modifier = Modifier.padding(end = 4.dp)
                 ) {
@@ -652,13 +652,13 @@ fun TransactionItem(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Delete",
-                    tint = TextRed,
+                    tint = MaterialTheme.colorScheme.error, // Changed
                     modifier = Modifier.scale(iconScale)
                 )
             }
         },
         dismissContent = {
-            TransactionCard(
+            TransactionCard( // TransactionCard itself uses themed colors
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { /* Do nothing on click, just display details */ },
                 isHighlighted = false
@@ -672,7 +672,7 @@ fun TransactionItem(
                     Column(modifier = Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             val isExpense = !transaction.isCredit
-                            val amountColor = if (isExpense) TextRed else Color.Green.copy(alpha = 0.8f)
+                            val amountColor = if (isExpense) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary // Changed
                             val amountPrefix = if (isExpense) "-" else "+"
                             Text(
                                 text = "$amountPrefix₹${String.format("%.2f", abs(transaction.amount))}",
@@ -685,7 +685,7 @@ fun TransactionItem(
                         Text(
                             text = transaction.description.ifEmpty { "No description" },
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextWhite.copy(alpha = 0.7f),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), // Changed
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -693,7 +693,7 @@ fun TransactionItem(
                         Text(
                             text = dateFormatter.format(Date(transaction.date)),
                             style = MaterialTheme.typography.bodySmall,
-                            color = TextWhite.copy(alpha = 0.6f)
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f) // Changed
                         )
                     }
                     // Removed IconButton for delete

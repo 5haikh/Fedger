@@ -39,10 +39,11 @@ import androidx.compose.ui.semantics.role
 import com.example.fedger.model.Person
 import com.example.fedger.ui.PersonViewModel
 import com.example.fedger.ui.PersonSortOption
-import com.example.fedger.ui.theme.*
+// import com.example.fedger.ui.theme.* // Removed direct theme imports
 import kotlinx.coroutines.flow.Flow
 import kotlin.math.abs
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.material3.TopAppBarDefaults // Added for TopAppBar colors
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -169,14 +170,15 @@ fun PersonListScreen(
                                 .size(44.dp)
                                 .shadow(
                                     elevation = 6.dp,
-                                    shape = CircleShape
+                                    shape = CircleShape,
+                                    spotColor = MaterialTheme.colorScheme.secondary // Added spotColor
                                 )
                                 .clip(CircleShape)
                                 .background(
                                     brush = Brush.radialGradient(
                                         colors = listOf(
-                                            MediumPurple,
-                                            MediumPurple.copy(alpha = 0.9f)
+                                            MaterialTheme.colorScheme.primary, // Changed
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.9f) // Changed
                                         )
                                     )
                                 ),
@@ -184,7 +186,7 @@ fun PersonListScreen(
                         ) {
                             Text(
                                 text = "₹",
-                                color = TextWhite,
+                                color = MaterialTheme.colorScheme.onPrimary, // Changed
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -193,7 +195,7 @@ fun PersonListScreen(
                         Text(
                             text = "Fedger",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = TextWhite,
+                            color = MaterialTheme.colorScheme.onPrimary, // Changed
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -203,6 +205,7 @@ fun PersonListScreen(
                     AppSwitcher(
                         navController = navController,
                         currentApp = "Ledger"
+                        // Tint for AppSwitcher will be handled by its own theming update
                     )
                     
                     // Import/Export button
@@ -210,13 +213,14 @@ fun PersonListScreen(
                         Icon(
                             Icons.Default.ImportExport,
                             contentDescription = "Import/Export Data",
-                            tint = TextWhite
+                            tint = MaterialTheme.colorScheme.onPrimary // Changed
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DeepPurple,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                    containerColor = MaterialTheme.colorScheme.primary, // Changed
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary, // Changed
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary // Changed
                 )
             )
         }
@@ -225,6 +229,7 @@ fun PersonListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background) // Added background
                 .pullRefresh(pullRefreshState)
         ) {
             Column(
@@ -236,12 +241,12 @@ fun PersonListScreen(
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { updateSearchQuery(it) },
-                    placeholder = { Text("Search contacts", color = TextGrey) },
-                    leadingIcon = { 
+                    placeholder = { Text("Search contacts", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
+                    leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
-                            tint = LightPurple
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                         )
                     },
                     trailingIcon = {
@@ -252,20 +257,20 @@ fun PersonListScreen(
                                 Icon(
                                     imageVector = Icons.Default.Clear,
                                     contentDescription = "Clear search",
-                                    tint = LightPurple
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             }
                         }
                     },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MediumPurple,
-                        unfocusedBorderColor = LightPurple.copy(alpha = 0.3f),
-                        focusedTextColor = TextWhite,
-                        unfocusedTextColor = TextWhite,
-                        cursorColor = MediumPurple,
-                        focusedContainerColor = CardBackground.copy(alpha = 0.2f),
-                        unfocusedContainerColor = CardBackground.copy(alpha = 0.1f),
-                        disabledTextColor = TextWhite.copy(alpha = 0.5f)
+                        focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Changed
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                        cursorColor = MaterialTheme.colorScheme.primary, // Changed
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f), // Changed
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f), // Changed
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) // Changed
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -292,14 +297,14 @@ fun PersonListScreen(
                     Text(
                         text = "Sort by:",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextGrey
+                        color = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                     )
                     Surface(
                         tonalElevation = 4.dp,
                         shadowElevation = 8.dp,
                         shape = MaterialTheme.shapes.medium,
-                                border = BorderStroke(1.dp, LightPurple.copy(alpha = 0.3f)),
-                        color = CardBackground.copy(alpha = 0.85f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)), // Changed
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.85f), // Changed
                         modifier = Modifier
                             .height(40.dp)
                             .defaultMinSize(minWidth = 160.dp)
@@ -336,13 +341,13 @@ fun PersonListScreen(
                                     PersonSortOption.LAST_ADDED -> "Recently Added"
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = TextWhite,
+                                color = MaterialTheme.colorScheme.onSurface, // Changed
                                 fontWeight = FontWeight.Medium
                             )
                             Icon(
                                 imageVector = Icons.Default.ArrowDropDown,
                                 contentDescription = null,
-                                tint = LightPurple,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
                                 modifier = Modifier.padding(start = 8.dp)
                             )
                                 }
@@ -352,8 +357,8 @@ fun PersonListScreen(
                         expanded = showSortDropdown,
                         onDismissRequest = { showSortDropdown = false },
                         modifier = Modifier
-                                .background(CardBackground, shape = MaterialTheme.shapes.medium)
-                            .border(BorderStroke(1.dp, LightPurple.copy(alpha = 0.3f)), shape = MaterialTheme.shapes.medium)
+                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp), shape = MaterialTheme.shapes.medium) // Changed
+                            .border(BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)), shape = MaterialTheme.shapes.medium) // Changed
                             .shadow(8.dp, shape = MaterialTheme.shapes.medium)
                     ) {
                         SortOption(
@@ -411,7 +416,7 @@ fun PersonListScreen(
                         Text(
                             text = "Search results for \"$searchQuery\"",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextGrey
+                            color = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                         )
                     }
                 }
@@ -490,31 +495,31 @@ fun PersonListScreen(
             PullRefreshIndicator(
                 refreshing = refreshing,
                 state = pullRefreshState,
-                backgroundColor = DeepPurple,
-                contentColor = MediumPurple,
+                backgroundColor = MaterialTheme.colorScheme.surface, // Changed
+                contentColor = MaterialTheme.colorScheme.primary, // Changed
                 modifier = Modifier.align(Alignment.TopCenter)
             )
             
             // Confirmation Dialog for deleting a person
             if (showDeleteDialog && personToDelete != null) {
                 AlertDialog(
-                    onDismissRequest = { 
-                        showDeleteDialog = false 
+                    onDismissRequest = {
+                        showDeleteDialog = false
                         personToDelete = null
                     },
-                    title = { 
+                    title = {
                         Text(
-                            text = "Delete Contact", 
+                            text = "Delete Contact",
                             style = MaterialTheme.typography.titleLarge,
-                            color = TextWhite
-                        ) 
+                            color = MaterialTheme.colorScheme.onSurface // Changed
+                        )
                     },
-                    text = { 
+                    text = {
                         Text(
                             text = "Are you sure you want to delete ${personToDelete?.name}? All associated transactions will also be deleted. This action cannot be undone.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextWhite
-                        ) 
+                            color = MaterialTheme.colorScheme.onSurfaceVariant // Changed
+                        )
                     },
                     confirmButton = {
                         Button(
@@ -524,8 +529,8 @@ fun PersonListScreen(
                                 personToDelete = null
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = TextRed,
-                                contentColor = TextWhite
+                                containerColor = MaterialTheme.colorScheme.error, // Changed
+                                contentColor = MaterialTheme.colorScheme.onError // Changed
                             )
                         ) {
                             Text("Delete")
@@ -533,18 +538,18 @@ fun PersonListScreen(
                     },
                     dismissButton = {
                         OutlinedButton(
-                            onClick = { 
-                                showDeleteDialog = false 
+                            onClick = {
+                                showDeleteDialog = false
                                 personToDelete = null
                             },
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = TextWhite
+                                contentColor = MaterialTheme.colorScheme.onSurface // Changed
                             )
                         ) {
                             Text("Cancel")
                         }
                     },
-                    containerColor = CardBackground,
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp), // Changed
                     shape = MaterialTheme.shapes.large
                 )
             }
@@ -586,13 +591,13 @@ fun PersonItem(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Delete",
-                    tint = TextRed,
+                    tint = MaterialTheme.colorScheme.error, // Changed
                     modifier = Modifier.scale(iconScale)
                 )
             }
         },
         dismissContent = {
-    EnhancedCard(
+    EnhancedCard( // EnhancedCard itself now uses themed colors
         modifier = modifier.fillMaxWidth(),
         onClick = onPersonClick,
         elevation = 4.dp
@@ -614,14 +619,15 @@ fun PersonItem(
                         .size(48.dp)
                         .shadow(
                             elevation = 4.dp,
-                            shape = CircleShape
+                            shape = CircleShape,
+                            spotColor = MaterialTheme.colorScheme.primary // Added spotColor
                         )
                         .clip(CircleShape)
                         .background(
                             brush = Brush.radialGradient(
                                 colors = listOf(
-                                    LightPurple.copy(alpha = 0.7f),
-                                    MediumPurple.copy(alpha = 0.5f)
+                                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f), // Changed
+                                    MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f) // Changed
                                 )
                             )
                         ),
@@ -631,7 +637,7 @@ fun PersonItem(
                         text = person.name.firstOrNull()?.uppercase() ?: "?",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        color = TextWhite
+                        color = MaterialTheme.colorScheme.onPrimaryContainer // Changed
                     )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
@@ -644,7 +650,7 @@ fun PersonItem(
                         text = person.name,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = TextWhite,
+                        color = MaterialTheme.colorScheme.onSurface, // Changed
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -653,9 +659,9 @@ fun PersonItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val balanceColor = when {
-                            balance > 0 -> TextGreen
-                            balance < 0 -> TextRed
-                            else -> TextGrey
+                            balance > 0 -> MaterialTheme.colorScheme.tertiary // Changed
+                            balance < 0 -> MaterialTheme.colorScheme.error // Changed
+                            else -> MaterialTheme.colorScheme.onSurfaceVariant // Changed
                         }
                         Text(
                             text = when {
@@ -664,7 +670,7 @@ fun PersonItem(
                                 else -> "All settled"
                             },
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextGrey,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
                             maxLines = 1
                         )
                         if (balance != 0.0) {
@@ -701,11 +707,11 @@ private fun SortOption(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val backgroundColor = when {
-        selected -> MediumPurple.copy(alpha = 0.15f)
-        isPressed -> LightPurple.copy(alpha = 0.10f)
+        selected -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f) // Changed
+        isPressed -> MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.10f) // Changed
         else -> Color.Transparent
     }
-    val border = if (selected) BorderStroke(1.dp, MediumPurple) else null
+    val border = if (selected) BorderStroke(1.dp, MaterialTheme.colorScheme.primary) else null // Changed
     DropdownMenuItem(
         text = {
             Row(
@@ -728,14 +734,14 @@ private fun SortOption(
                     text = title,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                    color = TextWhite,
+                    color = MaterialTheme.colorScheme.onSurface, // Changed
                     modifier = Modifier.weight(1f)
                 )
                 if (selected) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
-                        tint = MediumPurple,
+                        tint = MaterialTheme.colorScheme.primary, // Changed
                         modifier = Modifier.size(20.dp)
                     )
                 }

@@ -24,10 +24,10 @@ import androidx.compose.ui.unit.sp
 import com.example.fedger.ui.PersonViewModel
 import com.example.fedger.ui.components.AccentCard
 import com.example.fedger.ui.components.EnhancedCard
-import com.example.fedger.ui.theme.*
+// import com.example.fedger.ui.theme.* // Removed direct theme imports
 import kotlin.math.abs
 import androidx.navigation.NavController
-import com.example.fedger.ui.components.AppSwitcher
+// import com.example.fedger.ui.components.AppSwitcher // AppSwitcher removed as per previous instruction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,14 +72,14 @@ fun BalanceSummaryScreen(
                                 .shadow(
                                     elevation = 6.dp,
                                     shape = CircleShape,
-                                    spotColor = PurpleHighlight
+                                    spotColor = MaterialTheme.colorScheme.secondary // Changed
                                 )
                                 .clip(CircleShape)
                                 .background(
                                     brush = Brush.radialGradient(
                                         colors = listOf(
-                                            MediumPurple,
-                                            MediumPurple.copy(alpha = 0.9f)
+                                            MaterialTheme.colorScheme.primary, // Changed
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.9f) // Changed
                                         )
                                     )
                                 ),
@@ -87,7 +87,7 @@ fun BalanceSummaryScreen(
                         ) {
                             Text(
                                 text = "₹",
-                                color = TextWhite,
+                                color = MaterialTheme.colorScheme.onPrimary, // Changed
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -96,7 +96,7 @@ fun BalanceSummaryScreen(
                         Text(
                             text = "Fedger",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = TextWhite,
+                            color = MaterialTheme.colorScheme.onPrimary, // Changed
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -106,13 +106,14 @@ fun BalanceSummaryScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = TextWhite
+                            tint = MaterialTheme.colorScheme.onPrimary // Changed
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DeepPurple,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                    containerColor = MaterialTheme.colorScheme.primary, // Changed
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary, // Changed
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary // Changed
                 ),
                 actions = {
                     // App Switcher removed as requested
@@ -124,6 +125,7 @@ fun BalanceSummaryScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .background(MaterialTheme.colorScheme.background) // Added background
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -132,7 +134,7 @@ fun BalanceSummaryScreen(
             Text(
                 text = "Balance Summary",
                 style = MaterialTheme.typography.headlineMedium,
-                color = TextWhite,
+                color = MaterialTheme.colorScheme.onBackground, // Changed
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 24.dp)
             )
@@ -147,7 +149,7 @@ fun BalanceSummaryScreen(
                 // "To Receive" card
                 AccentCard(
                     modifier = Modifier.weight(1f),
-                    accentColor = TextGreen,
+                    accentColor = MaterialTheme.colorScheme.tertiary, // Changed (Placeholder for positive)
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Column(
@@ -159,7 +161,7 @@ fun BalanceSummaryScreen(
                         Text(
                             text = "To Receive",
                             style = MaterialTheme.typography.titleMedium,
-                            color = TextGrey
+                            color = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                         )
                         
                         Spacer(modifier = Modifier.height(12.dp))
@@ -167,7 +169,7 @@ fun BalanceSummaryScreen(
                         Text(
                             text = "₹${String.format("%.2f", totalBalance.totalOwedToMe)}",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = TextGreen,
+                            color = MaterialTheme.colorScheme.tertiary, // Changed
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -176,7 +178,7 @@ fun BalanceSummaryScreen(
                 // "To Pay" card
                 AccentCard(
                     modifier = Modifier.weight(1f),
-                    accentColor = TextRed,
+                    accentColor = MaterialTheme.colorScheme.error, // Changed
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Column(
@@ -188,7 +190,7 @@ fun BalanceSummaryScreen(
                         Text(
                             text = "To Pay",
                             style = MaterialTheme.typography.titleMedium,
-                            color = TextGrey
+                            color = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                         )
                         
                         Spacer(modifier = Modifier.height(12.dp))
@@ -196,7 +198,7 @@ fun BalanceSummaryScreen(
                         Text(
                             text = "₹${String.format("%.2f", totalBalance.totalIOwed)}",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = TextRed,
+                            color = MaterialTheme.colorScheme.error, // Changed
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -218,16 +220,16 @@ fun BalanceSummaryScreen(
                     Text(
                         text = "Net Balance",
                         style = MaterialTheme.typography.titleMedium,
-                        color = TextGrey
+                        color = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                     )
                     
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     val netBalance = totalBalance.totalOwedToMe - totalBalance.totalIOwed
                     val balanceColor = when {
-                        netBalance > 0 -> TextGreen
-                        netBalance < 0 -> TextRed
-                        else -> TextGrey
+                        netBalance > 0 -> MaterialTheme.colorScheme.tertiary // Changed
+                        netBalance < 0 -> MaterialTheme.colorScheme.error // Changed
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant // Changed
                     }
                     
                     Text(
@@ -250,7 +252,7 @@ fun BalanceSummaryScreen(
                             else -> "Your accounts are balanced"
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = TextGrey,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
                         textAlign = TextAlign.Center
                     )
                 }
@@ -260,7 +262,7 @@ fun BalanceSummaryScreen(
             Text(
                 text = "Statistics",
                 style = MaterialTheme.typography.titleLarge,
-                color = TextWhite,
+                color = MaterialTheme.colorScheme.onBackground, // Changed
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -282,59 +284,59 @@ fun BalanceSummaryScreen(
                     SummaryItem(
                         title = "Total Contacts",
                         value = contacts.size.toString(),
-                        color = PurpleHighlight
+                        color = MaterialTheme.colorScheme.primary // Changed
                     )
                     
                     HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
-                        color = TextGrey.copy(alpha = 0.3f)
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f) // Changed
                     )
                     
                     SummaryItem(
                         title = "Total Transactions",
                         value = transactions.size.toString(),
-                        color = AccentAmber
+                        color = MaterialTheme.colorScheme.secondary // Changed
                     )
                     
                     HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
-                        color = TextGrey.copy(alpha = 0.3f)
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f) // Changed
                     )
                     
                     SummaryItem(
                         title = "Contacts To Receive From",
                         value = contactsWithPositiveBalance.toString(),
-                        color = TextGreen
+                        color = MaterialTheme.colorScheme.tertiary // Changed
                     )
                     
                     HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
-                        color = TextGrey.copy(alpha = 0.3f)
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f) // Changed
                     )
                     
                     SummaryItem(
                         title = "Contacts To Pay",
                         value = contactsWithNegativeBalance.toString(),
-                        color = TextRed
+                        color = MaterialTheme.colorScheme.error // Changed
                     )
                     
                     HorizontalDivider(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
-                        color = TextGrey.copy(alpha = 0.3f)
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f) // Changed
                     )
                     
                     SummaryItem(
                         title = "Settled Contacts",
                         value = contactsWithZeroBalance.toString(),
-                        color = TextGrey
+                        color = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                     )
                 }
             }
@@ -358,7 +360,7 @@ fun SummaryItem(
         Text(
             text = title,
             style = MaterialTheme.typography.bodyLarge,
-            color = TextWhite
+            color = MaterialTheme.colorScheme.onSurface // Changed
         )
         
         Box(

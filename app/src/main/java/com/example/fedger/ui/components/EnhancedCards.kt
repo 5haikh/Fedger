@@ -29,12 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.fedger.ui.theme.CardBackground
-import com.example.fedger.ui.theme.LightPurple
-import com.example.fedger.ui.theme.MediumPurple
-import com.example.fedger.ui.theme.SurfaceDark
-import com.example.fedger.ui.theme.SurfaceLight
-import com.example.fedger.ui.theme.PurpleHighlight
 
 // Simplified enhanced card with optimized animation
 @Composable
@@ -74,7 +68,7 @@ fun EnhancedCard(
             defaultElevation = elevation
         ),
         colors = CardDefaults.cardColors(
-            containerColor = CardBackground // Use solid color instead of gradient
+            containerColor = MaterialTheme.colorScheme.surface // Changed
         ),
     ) {
         // Add a thin border inside the content area
@@ -83,7 +77,7 @@ fun EnhancedCard(
                 .fillMaxWidth()
                 .border(
                     width = 1.dp,
-                    color = LightPurple.copy(alpha = 0.3f),
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Changed
                     shape = shape
                 )
                 .padding(16.dp),
@@ -131,7 +125,7 @@ fun TransactionCard(
             defaultElevation = if (isHighlighted) 6.dp else 2.dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = if (isHighlighted) SurfaceLight else CardBackground
+            containerColor = if (isHighlighted) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface // Changed
         )
     ) {
         // Simplified border
@@ -140,7 +134,7 @@ fun TransactionCard(
                 .fillMaxWidth()
                 .border(
                     width = if (isHighlighted) 1.5.dp else 1.dp,
-                    color = if (isHighlighted) PurpleHighlight.copy(alpha = 0.8f) else LightPurple.copy(alpha = 0.3f),
+                    color = if (isHighlighted) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Changed
                     shape = shape
                 )
                 .padding(16.dp),
@@ -154,17 +148,17 @@ fun TransactionCard(
 fun GradientSurface(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.large,
-    startColor: Color = CardBackground,
-    endColor: Color = SurfaceDark,
+    startColor: Color = MaterialTheme.colorScheme.surface, // Changed
+    endColor: Color = MaterialTheme.colorScheme.surfaceVariant, // Changed (though not used directly in current impl)
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
         modifier = modifier
             .clip(shape)
-            .background(startColor) // Simplified to solid color
+            .background(startColor) // Simplified to solid color, uses themed startColor
             .border(
                 width = 1.dp,
-                color = LightPurple.copy(alpha = 0.3f),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Changed
                 shape = shape
             ),
         content = content
@@ -175,7 +169,7 @@ fun GradientSurface(
 @Composable
 fun AccentCard(
     modifier: Modifier = Modifier,
-    accentColor: Color = MediumPurple,
+    accentColor: Color = MaterialTheme.colorScheme.primary, // Changed
     shape: Shape = MaterialTheme.shapes.medium,
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
@@ -208,7 +202,7 @@ fun AccentCard(
             defaultElevation = 4.dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = SurfaceLight
+            containerColor = MaterialTheme.colorScheme.surfaceVariant // Changed
         )
     ) {
         Column(
@@ -216,7 +210,7 @@ fun AccentCard(
                 .fillMaxWidth()
                 .border(
                     width = 2.dp,
-                    color = accentColor.copy(alpha = 0.8f),
+                    color = accentColor.copy(alpha = 0.8f), // Uses themed accentColor parameter
                     shape = shape
                 )
                 .padding(16.dp),

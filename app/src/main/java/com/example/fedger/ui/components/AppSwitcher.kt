@@ -41,10 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fedger.ui.navigation.Screen
-import com.example.fedger.ui.theme.LightPurple
-import com.example.fedger.ui.theme.MediumPurple
-import com.example.fedger.ui.theme.PurpleHighlight
-import com.example.fedger.ui.theme.TextWhite
 import kotlinx.coroutines.delay
 
 /**
@@ -55,7 +51,7 @@ import kotlinx.coroutines.delay
 fun AppSwitcher(
     navController: NavController,
     currentApp: String,
-    tint: Color = TextWhite
+    tint: Color = MaterialTheme.colorScheme.onPrimaryContainer // Changed
 ) {
     // Use the new enhanced toggle style app switcher
     EnhancedToggleAppSwitcher(
@@ -73,7 +69,7 @@ fun AppSwitcher(
 fun EnhancedToggleAppSwitcher(
     navController: NavController,
     currentApp: String,
-    tint: Color = TextWhite
+    tint: Color = MaterialTheme.colorScheme.onPrimaryContainer // Changed
 ) {
     val isLedgerSelected = currentApp == "Ledger"
     val isPasswordManagerSelected = currentApp == "Password Manager"
@@ -110,13 +106,13 @@ fun EnhancedToggleAppSwitcher(
             .shadow(
                 elevation = 8.dp,
                 shape = RoundedCornerShape(22.dp),
-                spotColor = if (isLedgerSelected) MediumPurple else PurpleHighlight
+                spotColor = if (isLedgerSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary // Changed
             )
             .clip(RoundedCornerShape(22.dp))
-            .background(Color(0xFF151515))
+            .background(MaterialTheme.colorScheme.surfaceVariant) // Changed
             .border(
                 width = 1.5.dp,
-                color = if (isLedgerSelected) MediumPurple.copy(alpha = 0.8f) else PurpleHighlight.copy(alpha = 0.8f),
+                color = if (isLedgerSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f), // Changed
                 shape = RoundedCornerShape(22.dp)
             )
     ) {
@@ -131,7 +127,7 @@ fun EnhancedToggleAppSwitcher(
                     .weight(1f)
                     .fillMaxHeight()
                     .background(
-                        color = if (isLedgerSelected) MediumPurple.copy(alpha = 0.2f) else Color.Transparent,
+                        color = if (isLedgerSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent, // Changed
                         shape = RoundedCornerShape(topStart = 22.dp, bottomStart = 22.dp)
                     )
                     .clickable {
@@ -147,7 +143,7 @@ fun EnhancedToggleAppSwitcher(
                 Icon(
                     imageVector = Icons.Default.CreditCard,
                     contentDescription = "Ledger",
-                    tint = if (isLedgerSelected) TextWhite else TextWhite.copy(alpha = 0.6f),
+                    tint = if (isLedgerSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f), // Changed
                     modifier = Modifier
                         .size(26.dp)
                         .graphicsLayer {
@@ -164,7 +160,7 @@ fun EnhancedToggleAppSwitcher(
                     .weight(1f)
                     .fillMaxHeight()
                     .background(
-                        color = if (isPasswordManagerSelected) PurpleHighlight.copy(alpha = 0.2f) else Color.Transparent,
+                        color = if (isPasswordManagerSelected) MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f) else Color.Transparent, // Changed
                         shape = RoundedCornerShape(topEnd = 22.dp, bottomEnd = 22.dp)
                     )
                     .clickable {
@@ -180,7 +176,7 @@ fun EnhancedToggleAppSwitcher(
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = "Password Manager",
-                    tint = if (isPasswordManagerSelected) TextWhite else TextWhite.copy(alpha = 0.6f),
+                    tint = if (isPasswordManagerSelected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f), // Changed
                     modifier = Modifier
                         .size(26.dp)
                         .graphicsLayer {
@@ -221,7 +217,7 @@ fun EnhancedToggleAppSwitcher(
                     )
                 )
                 .background(
-                    color = if (isLedgerSelected) MediumPurple.copy(alpha = 0.25f) else PurpleHighlight.copy(alpha = 0.25f),
+                    color = if (isLedgerSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.25f) else MaterialTheme.colorScheme.secondary.copy(alpha = 0.25f), // Changed
                     shape = RoundedCornerShape(
                         topStart = if (isLedgerSelected) 22.dp else 0.dp,
                         bottomStart = if (isLedgerSelected) 22.dp else 0.dp,
@@ -231,7 +227,7 @@ fun EnhancedToggleAppSwitcher(
                 )
                 .border(
                     width = 1.dp,
-                    color = if (isLedgerSelected) MediumPurple.copy(alpha = 0.5f) else PurpleHighlight.copy(alpha = 0.5f),
+                    color = if (isLedgerSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f), // Changed
                     shape = RoundedCornerShape(
                         topStart = if (isLedgerSelected) 22.dp else 0.dp,
                         bottomStart = if (isLedgerSelected) 22.dp else 0.dp,
@@ -263,14 +259,14 @@ private fun AppSwitcherItem(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(MediumPurple.copy(alpha = 0.3f))
+                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)) // Changed
                         .padding(6.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = TextWhite,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer, // Changed
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -279,7 +275,7 @@ private fun AppSwitcherItem(
                 
                 Text(
                     text = title,
-                    color = TextWhite,
+                    color = MaterialTheme.colorScheme.onSurface, // Changed (assuming DropdownMenu is on a surface)
                     fontWeight = if (isPressed) FontWeight.Bold else FontWeight.Normal
                 )
             }

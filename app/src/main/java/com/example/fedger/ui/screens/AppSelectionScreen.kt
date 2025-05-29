@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.fedger.ui.theme.*
+// import com.example.fedger.ui.theme.* // Removed direct theme imports
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.gestures.detectTapGestures
 import kotlinx.coroutines.launch
@@ -84,8 +84,8 @@ fun AppSelectionScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        DeepPurple,
-                        DeepPurple.copy(alpha = 0.95f)
+                        MaterialTheme.colorScheme.background, // Changed
+                        MaterialTheme.colorScheme.background.copy(alpha = 0.95f) // Changed
                     )
                 )
             )
@@ -99,7 +99,7 @@ fun AppSelectionScreen(
                 .background(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            MediumPurple,
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), // Changed
                             Color.Transparent
                         )
                     )
@@ -115,7 +115,7 @@ fun AppSelectionScreen(
                 .background(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            PurpleHighlight,
+                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f), // Changed
                             Color.Transparent
                         )
                     )
@@ -158,7 +158,7 @@ fun AppSelectionScreen(
                                 .background(
                                     brush = Brush.radialGradient(
                                         colors = listOf(
-                                            MediumPurple,
+                                            MaterialTheme.colorScheme.primary, // Changed
                                             Color.Transparent,
                                         )
                                     ),
@@ -174,13 +174,13 @@ fun AppSelectionScreen(
                                 .shadow(
                                     elevation = 8.dp,
                                     shape = CircleShape,
-                                    spotColor = MediumPurple
+                                    spotColor = MaterialTheme.colorScheme.primary // Changed
                                 )
                                 .background(
                                     brush = Brush.radialGradient(
                                         colors = listOf(
-                                            MediumPurple,
-                                            MediumPurple.copy(alpha = 0.9f)
+                                            MaterialTheme.colorScheme.primary, // Changed
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.9f) // Changed
                                         )
                                     ),
                                     shape = CircleShape
@@ -189,7 +189,7 @@ fun AppSelectionScreen(
                         ) {
                             Text(
                                 text = "₹",
-                                color = TextWhite,
+                                color = MaterialTheme.colorScheme.onPrimary, // Changed
                                 fontSize = 48.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -198,7 +198,7 @@ fun AppSelectionScreen(
 
                     Text(
                         text = "FEDGER",
-                        color = TextWhite,
+                        color = MaterialTheme.colorScheme.onBackground, // Changed
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 3.sp
@@ -209,7 +209,7 @@ fun AppSelectionScreen(
                     Text(
                         text = "Your digital finance & security companion",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = TextWhite.copy(alpha = 0.8f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f), // Changed
                         textAlign = TextAlign.Center
                     )
                 }
@@ -231,7 +231,7 @@ fun AppSelectionScreen(
                 ) {
                     Text(
                         text = "SELECT AN APP",
-                        color = TextWhite.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f), // Changed
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         letterSpacing = 3.sp,
@@ -247,8 +247,8 @@ fun AppSelectionScreen(
                             title = "Ledger",
                             description = "Track your financial transactions easily",
                             icon = Icons.Default.CreditCard,
-                            primaryColor = MediumPurple,
-                            secondaryColor = MediumPurple.copy(alpha = 0.7f),
+                            primaryColor = MaterialTheme.colorScheme.primaryContainer, // Changed
+                            secondaryColor = MaterialTheme.colorScheme.onPrimaryContainer, // Changed
                             onClick = onLedgerSelected
                         )
                         
@@ -257,8 +257,8 @@ fun AppSelectionScreen(
                             title = "Password Manager",
                             description = "Securely store & manage your passwords",
                             icon = Icons.Default.Lock,
-                            primaryColor = PurpleHighlight,
-                            secondaryColor = PurpleHighlight.copy(alpha = 0.7f),
+                            primaryColor = MaterialTheme.colorScheme.secondaryContainer, // Changed
+                            secondaryColor = MaterialTheme.colorScheme.onSecondaryContainer, // Changed
                             onClick = onPasswordManagerSelected
                         )
                     }
@@ -272,7 +272,7 @@ fun AppSelectionScreen(
             ) {
                 Text(
                     text = "v1.0",
-                    color = TextWhite.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f), // Changed
                     fontSize = 12.sp,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -308,14 +308,14 @@ fun EnhancedAppSelectionCard(
             .shadow(
                 elevation = if (isPressed) 2.dp else 6.dp,
                 shape = RoundedCornerShape(16.dp),
-                spotColor = primaryColor
+                spotColor = primaryColor // primaryColor is now a themed color
             )
             .clip(RoundedCornerShape(16.dp))
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
-                        CardBackground,
-                        CardBackground.copy(alpha = 0.95f)
+                        MaterialTheme.colorScheme.surface, // Changed
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.95f) // Changed
                     )
                 )
             )
@@ -379,7 +379,7 @@ fun EnhancedAppSelectionCard(
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
-                    tint = primaryColor,
+                    tint = primaryColor, // primaryColor is now a themed color
                     modifier = Modifier.size(30.dp)
                 )
             }
@@ -389,7 +389,7 @@ fun EnhancedAppSelectionCard(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleLarge,
-                    color = TextWhite,
+                    color = MaterialTheme.colorScheme.onSurface, // Changed
                     fontWeight = FontWeight.Bold
                 )
                 
@@ -398,7 +398,7 @@ fun EnhancedAppSelectionCard(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextGrey,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
                     maxLines = 1
                 )
             }
@@ -407,11 +407,11 @@ fun EnhancedAppSelectionCard(
             
             // Arrow indicator
             Icon(
-                imageVector = Icons.Default.Shield,
+                imageVector = Icons.Default.Shield, // Consider changing this icon if Shield doesn't fit
                 contentDescription = null,
-                tint = secondaryColor.copy(alpha = 0.7f),
+                tint = secondaryColor.copy(alpha = 0.7f), // secondaryColor is now a themed color
                 modifier = Modifier.size(20.dp)
             )
         }
     }
-} 
+}

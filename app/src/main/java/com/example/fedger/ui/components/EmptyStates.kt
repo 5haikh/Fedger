@@ -55,19 +55,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.contentDescription
-import com.example.fedger.ui.theme.AccentTeal
-import com.example.fedger.ui.theme.LightPurple
-import com.example.fedger.ui.theme.MediumPurple
-import com.example.fedger.ui.theme.PurpleHighlight
-import com.example.fedger.ui.theme.TextGrey
-import com.example.fedger.ui.theme.TextWhite
-import com.example.fedger.ui.theme.HighContrastGrey
 
 // Simplified loading indicator with reduced animations and improved battery efficiency
 @Composable
 fun StyledLoadingIndicator(
     modifier: Modifier = Modifier,
-    color: Color = MediumPurple,
+    color: Color = MaterialTheme.colorScheme.primary, // Changed
     size: Float = 1f,
     isVisible: Boolean = true // Add visibility control to stop animations when not visible
 ) {
@@ -96,7 +89,7 @@ fun StyledLoadingIndicator(
         // Use a more battery-efficient approach with fewer composables
         CircularProgressIndicator(
             modifier = Modifier.size((50 * size).dp),
-            color = PurpleHighlight.copy(alpha = 0.4f),
+            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f), // Changed
             strokeWidth = (4 * size).dp,
             strokeCap = StrokeCap.Round
         )
@@ -106,7 +99,7 @@ fun StyledLoadingIndicator(
             modifier = Modifier
                 .size((36 * size).dp),
             progress = { rotationAnim / 360f },
-            color = MediumPurple,
+            color = color, // Changed - uses parameter
             strokeWidth = (3 * size).dp,
             strokeCap = StrokeCap.Round
         )
@@ -122,7 +115,7 @@ fun EmptyPersonListState(
         icon = Icons.Default.Person,
         title = "No Contacts Added Yet",
         description = "Use the 'Add Contact' button in the bottom navigation bar to add someone you owe money to or who owes you",
-        iconTint = PurpleHighlight,
+        iconTint = MaterialTheme.colorScheme.secondary, // Changed
         showButton = false,
         showBottomBarHint = true
     )
@@ -139,7 +132,7 @@ fun EmptyTransactionsState(
         description = "Track money flow by adding transactions with this person",
         buttonText = "Add Transaction",
         onButtonClick = onAddClick,
-        iconTint = AccentTeal
+        iconTint = MaterialTheme.colorScheme.tertiary // Changed
     )
 }
 
@@ -153,7 +146,7 @@ fun EmptySearchState(
         title = "No Results Found",
         description = "We couldn't find any results for \"$query\"",
         showButton = false,
-        iconTint = TextGrey
+        iconTint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
     )
 }
 
@@ -165,7 +158,7 @@ private fun EmptyStateBase(
     description: String,
     buttonText: String = "",
     onButtonClick: () -> Unit = {},
-    iconTint: Color = LightPurple,
+    iconTint: Color = MaterialTheme.colorScheme.primary, // Changed
     showButton: Boolean = true,
     showBottomBarHint: Boolean = false
 ) {
@@ -203,7 +196,7 @@ private fun EmptyStateBase(
         Text(
             text = title,
             style = MaterialTheme.typography.headlineMedium,
-            color = TextWhite,
+            color = MaterialTheme.colorScheme.onSurface, // Changed
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
@@ -213,7 +206,7 @@ private fun EmptyStateBase(
         Text(
             text = description,
             style = MaterialTheme.typography.bodyLarge,
-            color = HighContrastGrey, // Use higher contrast color
+            color = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(0.8f)
         )
@@ -224,8 +217,8 @@ private fun EmptyStateBase(
             ElevatedButton(
                 onClick = onButtonClick,
                 colors = ButtonDefaults.elevatedButtonColors(
-                    containerColor = MediumPurple,
-                    contentColor = TextWhite
+                    containerColor = MaterialTheme.colorScheme.primary, // Changed
+                    contentColor = MaterialTheme.colorScheme.onPrimary // Changed
                 ),
                 modifier = Modifier
                     .height(50.dp)
@@ -253,7 +246,7 @@ private fun EmptyStateBase(
             Icon(
                 imageVector = Icons.Default.ArrowDownward,
                 contentDescription = "Look at bottom navigation",
-                tint = TextGrey,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
                 modifier = Modifier.size(32.dp)
             )
             
@@ -262,7 +255,7 @@ private fun EmptyStateBase(
             Text(
                 text = "Use the options below",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TextGrey,
+                color = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
                 textAlign = TextAlign.Center
             )
         }
@@ -315,7 +308,7 @@ fun LoadingState(
         Text(
             text = message,
             style = MaterialTheme.typography.bodyLarge,
-            color = HighContrastGrey,
+            color = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
             fontWeight = FontWeight.Medium
         )
     }

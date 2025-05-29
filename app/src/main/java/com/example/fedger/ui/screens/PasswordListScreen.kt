@@ -27,10 +27,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.fedger.model.PasswordEntry
 import com.example.fedger.ui.PasswordViewModel
 import com.example.fedger.ui.components.EnhancedCard
-import com.example.fedger.ui.theme.*
+// import com.example.fedger.ui.theme.* // Removed direct theme imports
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.navigation.NavController
+import androidx.compose.material3.TopAppBarDefaults // Added for TopAppBar colors
 import com.example.fedger.ui.components.AppSwitcher
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -77,14 +78,15 @@ fun PasswordListScreen(
                                 .size(44.dp)
                                 .shadow(
                                     elevation = 6.dp,
-                                    shape = CircleShape
+                                    shape = CircleShape,
+                                    spotColor = MaterialTheme.colorScheme.secondary // Added spotColor for consistency
                                 )
                                 .clip(CircleShape)
                                 .background(
                                     brush = Brush.radialGradient(
                                         colors = listOf(
-                                            MediumPurple,
-                                            MediumPurple.copy(alpha = 0.9f)
+                                            MaterialTheme.colorScheme.primary, // Changed
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.9f) // Changed
                                         )
                                     )
                                 ),
@@ -93,7 +95,7 @@ fun PasswordListScreen(
                             Icon(
                                 imageVector = Icons.Default.Lock,
                                 contentDescription = "Password Icon",
-                                tint = TextWhite,
+                                tint = MaterialTheme.colorScheme.onPrimary, // Changed
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -101,21 +103,23 @@ fun PasswordListScreen(
                         Text(
                             text = "Password Manager",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = TextWhite,
+                            color = MaterialTheme.colorScheme.onPrimary, // Changed
                             fontWeight = FontWeight.Bold
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DeepPurple,
-                    titleContentColor = TextWhite,
-                    actionIconContentColor = TextWhite
+                    containerColor = MaterialTheme.colorScheme.primary, // Changed
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary, // Changed
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary, // Changed
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary // Changed (though no nav icon here)
                 ),
                 actions = {
                     // App Switcher
                     AppSwitcher(
                         navController = navController,
                         currentApp = "Password Manager"
+                        // Tint for AppSwitcher will be handled by its own theming update
                     )
                     
                     // Import/Export button
@@ -123,7 +127,7 @@ fun PasswordListScreen(
                         Icon(
                             Icons.Default.ImportExport,
                             contentDescription = "Import/Export Passwords",
-                            tint = TextWhite
+                            tint = MaterialTheme.colorScheme.onPrimary // Changed
                         )
                     }
                 }
@@ -133,7 +137,7 @@ fun PasswordListScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(DeepPurple)
+                .background(MaterialTheme.colorScheme.background) // Changed
                 .padding(paddingValues)
                 .pullRefresh(pullRefreshState)
         ) {
@@ -149,30 +153,30 @@ fun PasswordListScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp),
-                    placeholder = { Text("Search passwords...", color = TextGrey) },
+                    placeholder = { Text("Search passwords...", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // Changed
                     leadingIcon = {
-                        Icon(Icons.Default.Search, contentDescription = "Search", tint = LightPurple)
+                        Icon(Icons.Default.Search, contentDescription = "Search", tint = MaterialTheme.colorScheme.onSurfaceVariant) // Changed
                     },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
                             IconButton(onClick = { viewModel.clearSearchQuery() }) {
                                 Icon(
-                                    Icons.Default.Clear, 
+                                    Icons.Default.Clear,
                                     contentDescription = "Clear search",
-                                    tint = LightPurple
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             }
                         }
                     },
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = TextWhite,
-                        unfocusedTextColor = TextWhite,
-                        focusedContainerColor = SurfaceLight,
-                        unfocusedContainerColor = SurfaceLight,
-                        focusedBorderColor = MediumPurple,
-                        unfocusedBorderColor = LightPurple.copy(alpha = 0.5f),
-                        cursorColor = MediumPurple
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                        focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f), // Changed
+                        cursorColor = MaterialTheme.colorScheme.primary // Changed
                     ),
                     shape = MaterialTheme.shapes.medium
                 )
@@ -192,23 +196,23 @@ fun PasswordListScreen(
                                 imageVector = Icons.Default.Lock,
                                 contentDescription = null,
                                 modifier = Modifier.size(64.dp),
-                                tint = LightPurple
+                                tint = MaterialTheme.colorScheme.secondary // Changed
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = if (isSearchActive) 
-                                    "No results for \"$searchQuery\"" 
-                                else 
+                                text = if (isSearchActive)
+                                    "No results for \"$searchQuery\""
+                                else
                                     "No passwords yet",
                                 style = MaterialTheme.typography.headlineSmall,
-                                color = TextWhite
+                                color = MaterialTheme.colorScheme.onBackground // Changed
                             )
                             if (!isSearchActive) {
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     text = "Add your first password by tapping the + button",
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = TextGrey
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                                 )
                             }
                         }
@@ -241,8 +245,8 @@ fun PasswordListScreen(
                 refreshing = refreshing,
                 state = pullRefreshState,
                 modifier = Modifier.align(Alignment.TopCenter),
-                backgroundColor = SurfaceLight,
-                contentColor = MediumPurple
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant, // Changed
+                contentColor = MaterialTheme.colorScheme.primary // Changed
             )
         }
     }
@@ -268,13 +272,13 @@ fun PasswordEntryItem(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(MediumPurple.copy(alpha = 0.2f)),
+                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)), // Changed
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.VpnKey,
                     contentDescription = null,
-                    tint = LightPurple
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer // Changed
                 )
             }
             
@@ -288,7 +292,7 @@ fun PasswordEntryItem(
                     text = entry.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = TextWhite,
+                    color = MaterialTheme.colorScheme.onSurface, // Changed
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -306,7 +310,7 @@ fun PasswordEntryItem(
                 Text(
                     text = supportingText,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextGrey,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Changed
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -316,8 +320,8 @@ fun PasswordEntryItem(
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = "View Details",
-                tint = LightPurple
+                tint = MaterialTheme.colorScheme.onSurfaceVariant // Changed
             )
         }
     }
-} 
+}

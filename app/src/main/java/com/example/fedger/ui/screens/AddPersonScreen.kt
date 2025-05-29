@@ -29,9 +29,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import com.example.fedger.model.Person
-import com.example.fedger.ui.theme.*
 import com.example.fedger.ui.components.EnhancedCard
-import com.example.fedger.ui.components.GradientSurface
+// Removed direct theme imports like com.example.fedger.ui.theme.*
+// import com.example.fedger.ui.theme.TextWhite // Example, will be removed by tool if not used
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,14 +109,14 @@ fun AddPersonScreen(
                                 .shadow(
                                     elevation = 6.dp,
                                     shape = CircleShape,
-                                    spotColor = PurpleHighlight
+                                    spotColor = MaterialTheme.colorScheme.secondary // Changed
                                 )
                                 .clip(CircleShape)
                                 .background(
                                     brush = Brush.radialGradient(
                                         colors = listOf(
-                                            MediumPurple,
-                                            MediumPurple.copy(alpha = 0.9f)
+                                            MaterialTheme.colorScheme.primary, // Changed
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.9f) // Changed
                                         )
                                     )
                                 ),
@@ -124,7 +124,7 @@ fun AddPersonScreen(
                         ) {
                             Text(
                                 text = "₹",
-                                color = TextWhite,
+                                color = MaterialTheme.colorScheme.onPrimary, // Changed
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -133,7 +133,7 @@ fun AddPersonScreen(
                         Text(
                             text = "Fedger",
                             style = MaterialTheme.typography.headlineMedium,
-                            color = TextWhite,
+                            color = MaterialTheme.colorScheme.onPrimary, // Changed
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -143,13 +143,14 @@ fun AddPersonScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = TextWhite
+                            tint = MaterialTheme.colorScheme.onPrimary // Changed
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DeepPurple,
-                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                    containerColor = MaterialTheme.colorScheme.primary, // Changed
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary, // Changed
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary // Ensure nav icon also uses onPrimary
                 )
             )
         }
@@ -158,13 +159,14 @@ fun AddPersonScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .background(MaterialTheme.colorScheme.background) // Added background
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
                 text = "Add New Contact",
                 style = MaterialTheme.typography.headlineSmall,
-                color = TextWhite,
+                color = MaterialTheme.colorScheme.onBackground, // Changed
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
             )
@@ -188,14 +190,14 @@ fun AddPersonScreen(
                         Text(
                             text = "Contact Details",
                             style = MaterialTheme.typography.titleLarge,
-                            color = TextWhite,
+                            color = MaterialTheme.colorScheme.onSurface, // Changed
                             fontWeight = FontWeight.Bold
                         )
                         
                         Text(
                             text = "Add a new contact to track money flow with.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = TextGrey
+                            color = MaterialTheme.colorScheme.onSurfaceVariant // Changed
                         )
                         
                         Spacer(modifier = Modifier.height(4.dp))
@@ -204,27 +206,27 @@ fun AddPersonScreen(
                         Text(
                             text = "Name",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = TextWhite,
+                            color = MaterialTheme.colorScheme.onSurface, // Changed
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.semantics { contentDescription = "Name field label" }
                         )
                         
                         OutlinedTextField(
                             value = name,
-                            onValueChange = { 
+                            onValueChange = {
                                 name = it
                                 nameTouched = true
                                 nameError = validateName(it)
                             },
-                            placeholder = { Text("Enter contact's name", color = TextWhite.copy(alpha = 0.5f)) },
+                            placeholder = { Text("Enter contact's name", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) }, // Changed
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = MediumPurple,
-                                unfocusedBorderColor = LightPurple.copy(alpha = 0.3f),
-                                focusedTextColor = TextWhite,
-                                unfocusedTextColor = TextWhite,
-                                cursorColor = MediumPurple,
-                                focusedContainerColor = CardBackground.copy(alpha = 0.2f),
-                                unfocusedContainerColor = CardBackground.copy(alpha = 0.1f)
+                                focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Changed
+                                focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                                unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                                cursorColor = MaterialTheme.colorScheme.primary, // Changed
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f), // Changed
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f) // Changed
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             isError = nameTouched && nameError != null,
@@ -232,7 +234,7 @@ fun AddPersonScreen(
                                 if (nameTouched && nameError != null) {
                                     Text(
                                         text = nameError!!,
-                                        color = TextRed,
+                                        color = MaterialTheme.colorScheme.error, // Changed
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                 }
@@ -245,26 +247,26 @@ fun AddPersonScreen(
                         Text(
                             text = "Phone (Optional)",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = TextWhite,
+                            color = MaterialTheme.colorScheme.onSurface, // Changed
                             fontWeight = FontWeight.Medium
                         )
                         
                         OutlinedTextField(
                             value = phone,
-                            onValueChange = { 
+                            onValueChange = {
                                 phone = it
                                 phoneTouched = true
                                 phoneError = validatePhone(it)
                             },
-                            placeholder = { Text("Enter phone number", color = TextWhite.copy(alpha = 0.5f)) },
+                            placeholder = { Text("Enter phone number", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) }, // Changed
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = MediumPurple,
-                                unfocusedBorderColor = LightPurple.copy(alpha = 0.3f),
-                                focusedTextColor = TextWhite,
-                                unfocusedTextColor = TextWhite,
-                                cursorColor = MediumPurple,
-                                focusedContainerColor = CardBackground.copy(alpha = 0.2f),
-                                unfocusedContainerColor = CardBackground.copy(alpha = 0.1f)
+                                focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Changed
+                                focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                                unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                                cursorColor = MaterialTheme.colorScheme.primary, // Changed
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f), // Changed
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f) // Changed
                             ),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                             modifier = Modifier.fillMaxWidth(),
@@ -273,13 +275,13 @@ fun AddPersonScreen(
                                 if (phoneTouched && phoneError != null) {
                                     Text(
                                         text = phoneError!!,
-                                        color = TextRed,
+                                        color = MaterialTheme.colorScheme.error, // Changed
                                         style = MaterialTheme.typography.bodySmall
                                     )
-                                } else if (phoneTouched) {
+                                } else if (phoneTouched && phone.isNotBlank() && phoneError == null) { // Added phone.isNotBlank and phoneError == null
                                     Text(
                                         text = "Valid phone number format",
-                                        color = Color.Green.copy(alpha = 0.8f),
+                                        color = MaterialTheme.colorScheme.tertiary, // Changed (Placeholder for success color)
                                         style = MaterialTheme.typography.bodySmall
                                     )
                                 }
@@ -292,22 +294,22 @@ fun AddPersonScreen(
                         Text(
                             text = "Notes (Optional)",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = TextWhite,
+                            color = MaterialTheme.colorScheme.onSurface, // Changed
                             fontWeight = FontWeight.Medium
                         )
                         
                         OutlinedTextField(
                             value = notes,
                             onValueChange = { notes = it },
-                            placeholder = { Text("Add any notes about this contact", color = TextWhite.copy(alpha = 0.5f)) },
+                            placeholder = { Text("Add any notes about this contact", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) }, // Changed
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = MediumPurple,
-                                unfocusedBorderColor = LightPurple.copy(alpha = 0.3f),
-                                focusedTextColor = TextWhite,
-                                unfocusedTextColor = TextWhite,
-                                cursorColor = MediumPurple,
-                                focusedContainerColor = CardBackground.copy(alpha = 0.2f),
-                                unfocusedContainerColor = CardBackground.copy(alpha = 0.1f)
+                                focusedBorderColor = MaterialTheme.colorScheme.primary, // Changed
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Changed
+                                focusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                                unfocusedTextColor = MaterialTheme.colorScheme.onSurface, // Changed
+                                cursorColor = MaterialTheme.colorScheme.primary, // Changed
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f), // Changed
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f) // Changed
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -336,13 +338,13 @@ fun AddPersonScreen(
                     .height(56.dp)
                     .border(
                         width = 1.dp,
-                        color = LightPurple.copy(alpha = 0.3f),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), // Changed
                         shape = MaterialTheme.shapes.medium
                     ),
                 shape = MaterialTheme.shapes.medium,
                 colors = ButtonDefaults.elevatedButtonColors(
-                    containerColor = MediumPurple,
-                    contentColor = TextWhite
+                    containerColor = MaterialTheme.colorScheme.primary, // Changed
+                    contentColor = MaterialTheme.colorScheme.onPrimary // Changed
                 ),
                 elevation = ButtonDefaults.elevatedButtonElevation(
                     defaultElevation = 4.dp
@@ -352,7 +354,7 @@ fun AddPersonScreen(
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Save",
-                    tint = TextWhite
+                    tint = MaterialTheme.colorScheme.onPrimary // Changed
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(

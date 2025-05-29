@@ -21,8 +21,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -40,10 +42,6 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.fedger.ui.navigation.Screen
-import com.example.fedger.ui.theme.DeepPurple
-import com.example.fedger.ui.theme.LightPurple
-import com.example.fedger.ui.theme.MediumPurple
-import com.example.fedger.ui.theme.TextWhite
 
 // Password Nav Items following the same pattern as the ledger bottom bar
 sealed class PasswordNavItem(
@@ -89,7 +87,7 @@ fun PasswordBottomBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(elevation = 15.dp),
-            color = DeepPurple
+            color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp) // Changed
         ) {
             Row(
                 modifier = Modifier
@@ -133,8 +131,8 @@ private fun RowScope.PasswordNavItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) MediumPurple.copy(alpha = 0.3f) else Color.Transparent
-    val contentColor = if (isSelected) TextWhite else LightPurple.copy(alpha = 0.7f)
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f) else Color.Transparent // Changed
+    val contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f) // Changed
     val fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
     
     Column(

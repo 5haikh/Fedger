@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.Fedger" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- You can define dark-theme specific XML attributes here if necessary -->
+        <!-- For example, to set status bar color defaults for dark mode -->
+        <!-- <item name="android:statusBarColor">@color/your_dark_status_bar_color</item> -->
+    </style>
+</resources>

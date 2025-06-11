@@ -1,6 +1,7 @@
 package my.zaif.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -100,7 +101,7 @@ fun CredentialsScreen(navController: NavController) {
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { 
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     editingEntity = null
                     showAddEntityDialog = true 
                 },
@@ -122,7 +123,7 @@ fun CredentialsScreen(navController: NavController) {
                 expanded = true,
                 modifier = Modifier.shadow(
                     elevation = Spacing.elevationMedium,
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(Spacing.large),
                     spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 )
             )
@@ -150,8 +151,8 @@ fun CredentialsScreen(navController: NavController) {
                     ) { entity ->
                         AnimatedVisibility(
                             visible = true,
-                            enter = fadeIn(tween(Spacing.animationDurationMedium)) + 
-                                   slideInVertically(tween(Spacing.animationDurationMedium)) { it / 2 }
+                            enter = fadeIn(tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) +
+                                   slideInVertically(animationSpec = tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) { it / 2 }
                         ) {
                             EntityItem(
                                 entity = entity,
@@ -220,7 +221,7 @@ fun CredentialsScreen(navController: NavController) {
                             onClick = {
                                 entityToDelete?.let { entity ->
                                     viewModel.deleteEntity(entity)
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 }
                                 showDeleteConfirmation = false
                                 entityToDelete = null

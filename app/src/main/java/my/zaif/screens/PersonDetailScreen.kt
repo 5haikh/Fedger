@@ -1,6 +1,7 @@
 package my.zaif.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -178,7 +179,7 @@ fun PersonDetailScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { 
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     showAddTransactionDialog = true 
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -199,7 +200,7 @@ fun PersonDetailScreen(
                 expanded = true,
                 modifier = Modifier.shadow(
                     elevation = Spacing.elevationMedium,
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(Spacing.large),
                     spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 )
             )
@@ -222,8 +223,8 @@ fun PersonDetailScreen(
                     item {
                         AnimatedVisibility(
                             visible = true,
-                            enter = fadeIn(tween(Spacing.animationDurationMedium)) + 
-                                   slideInVertically(tween(Spacing.animationDurationMedium)) { it / 2 }
+                            enter = fadeIn(tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) +
+                                   slideInVertically(animationSpec = tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) { it / 2 }
                         ) {
                             PersonSummaryCard(
                                 person = person!!,
@@ -243,8 +244,8 @@ fun PersonDetailScreen(
                     item {
                         AnimatedVisibility(
                             visible = true,
-                            enter = fadeIn(tween(Spacing.animationDurationMedium + 100)) + 
-                                   slideInVertically(tween(Spacing.animationDurationMedium + 100)) { it / 2 }
+                            enter = fadeIn(tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) +
+                                   slideInVertically(animationSpec = tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) { it / 2 }
                         ) {
                             Text(
                                 text = "Transactions",
@@ -264,12 +265,12 @@ fun PersonDetailScreen(
                         item {
                             AnimatedVisibility(
                                 visible = true,
-                                enter = fadeIn(tween(Spacing.animationDurationLong)) + 
-                                       slideInVertically(tween(Spacing.animationDurationLong)) { it / 2 }
+                                enter = fadeIn(tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) +
+                                       slideInVertically(animationSpec = tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) { it / 2 }
                             ) {
                                 Text(
                                     text = "No transactions yet.\nTap the + button to add a transaction.",
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
                                     textAlign = TextAlign.Center,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier
@@ -285,8 +286,8 @@ fun PersonDetailScreen(
                         ) { transaction ->
                             AnimatedVisibility(
                                 visible = true,
-                                enter = fadeIn(tween(Spacing.animationDurationMedium)) + 
-                                       slideInVertically(tween(Spacing.animationDurationMedium)) { it / 2 }
+                                enter = fadeIn(tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) +
+                                       slideInVertically(animationSpec = tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) { it / 2 }
                             ) {
                                 TransactionItem(
                                     transaction = transaction,
@@ -362,7 +363,7 @@ fun PersonDetailScreen(
                                     viewModel.deleteTransaction(transaction)
                                     // Ensure balance is refreshed after deleting transaction
                                     viewModel.refreshBalance()
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 }
                                 showDeleteTransactionDialog = false
                                 transactionToDelete = null
@@ -411,7 +412,7 @@ fun PersonSummaryCard(
             // Avatar circle with first character
             Box(
                 modifier = Modifier
-                    .size(72.dp)
+                    .size(Spacing.largeAvatarSize)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center

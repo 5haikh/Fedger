@@ -1,6 +1,7 @@
 package my.zaif.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -118,7 +119,7 @@ fun LedgerScreen(navController: NavController) {
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { 
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     editingPerson = null
                     showAddPersonDialog = true 
                 },
@@ -140,7 +141,7 @@ fun LedgerScreen(navController: NavController) {
                 expanded = true,
                 modifier = Modifier.shadow(
                     elevation = Spacing.elevationMedium,
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(Spacing.large),
                     spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 )
             )
@@ -168,8 +169,8 @@ fun LedgerScreen(navController: NavController) {
                     ) { personWithBalance ->
                         AnimatedVisibility(
                             visible = true,
-                            enter = fadeIn(tween(Spacing.animationDurationMedium)) + 
-                                   slideInVertically(tween(Spacing.animationDurationMedium)) { it / 2 }
+                            enter = fadeIn(tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) +
+                                   slideInVertically(animationSpec = tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) { it / 2 }
                         ) {
                             PersonItem(
                                 personWithBalance = personWithBalance,
@@ -239,7 +240,7 @@ fun LedgerScreen(navController: NavController) {
                             onClick = {
                                 personToDelete?.let { person ->
                                     viewModel.deletePerson(person)
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 }
                                 showDeleteConfirmation = false
                                 personToDelete = null
@@ -311,9 +312,8 @@ fun PersonItem(
                 Text(
                     text = initial,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold
                     )
                 )
             }
@@ -356,7 +356,7 @@ fun PersonItem(
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.Medium
                     ),
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
                 // Show balance with appropriate color

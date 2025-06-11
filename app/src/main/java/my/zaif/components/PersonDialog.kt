@@ -12,8 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.automirrored.outlined.Notes
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -102,9 +102,8 @@ fun PersonDialog(
                     Text(
                         text = if (person == null) "Add New Person" else "Edit Person",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        // textAlign = TextAlign.Center, // Defaults to Start
                         modifier = Modifier.fillMaxWidth()
                     )
                     
@@ -136,7 +135,7 @@ fun PersonDialog(
                                 )
                             }
                         },
-                        shape = RoundedCornerShape(Spacing.cardCornerRadius),
+                        shape = RoundedCornerShape(Spacing.dialogCornerRadius),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -152,7 +151,7 @@ fun PersonDialog(
                         placeholder = { Text("Optional additional information") },
                         leadingIcon = { 
                             Icon(
-                                Icons.AutoMirrored.Outlined.Notes, 
+                                Icons.AutoMirrored.Filled.Notes,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                             ) 
@@ -160,7 +159,7 @@ fun PersonDialog(
                         modifier = Modifier.fillMaxWidth(),
                         minLines = 3,
                         maxLines = 5,
-                        shape = RoundedCornerShape(Spacing.cardCornerRadius),
+                        shape = RoundedCornerShape(Spacing.dialogCornerRadius),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -178,7 +177,7 @@ fun PersonDialog(
                         TextButton(
                             onClick = onDismiss,
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(Spacing.cardCornerRadius)
+                            shape = RoundedCornerShape(Spacing.dialogCornerRadius)
                         ) {
                             Text(
                                 text = "Cancel",
@@ -196,7 +195,7 @@ fun PersonDialog(
                                 }
                             },
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(Spacing.cardCornerRadius),
+                            shape = RoundedCornerShape(Spacing.dialogCornerRadius),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary

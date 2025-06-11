@@ -123,9 +123,8 @@ fun TransactionDialog(
                     Text(
                         text = "Add Transaction",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        // textAlign = TextAlign.Center, // Defaults to Start
                         modifier = Modifier.fillMaxWidth()
                     )
                     
@@ -205,7 +204,7 @@ fun TransactionDialog(
                             }
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        shape = RoundedCornerShape(Spacing.cardCornerRadius),
+                        shape = RoundedCornerShape(Spacing.dialogCornerRadius),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -241,7 +240,7 @@ fun TransactionDialog(
                                 )
                             }
                         },
-                        shape = RoundedCornerShape(Spacing.cardCornerRadius),
+                        shape = RoundedCornerShape(Spacing.dialogCornerRadius),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -254,7 +253,7 @@ fun TransactionDialog(
                     OutlinedButton(
                         onClick = { showDatePicker = true },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(Spacing.cardCornerRadius)
+                        shape = RoundedCornerShape(Spacing.dialogCornerRadius)
                     ) {
                         Icon(
                             Icons.Default.CalendarMonth,
@@ -278,7 +277,7 @@ fun TransactionDialog(
                         TextButton(
                             onClick = onDismiss,
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(Spacing.cardCornerRadius)
+                            shape = RoundedCornerShape(Spacing.dialogCornerRadius)
                         ) {
                             Text(
                                 text = "Cancel",
@@ -308,7 +307,7 @@ fun TransactionDialog(
                                 onSave(finalAmount, description, date)
                             },
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(Spacing.cardCornerRadius),
+                            shape = RoundedCornerShape(Spacing.dialogCornerRadius),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary

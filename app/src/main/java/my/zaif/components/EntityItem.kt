@@ -62,7 +62,7 @@ fun EntityItem(
                 Text(
                     text = initial,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    style = MaterialTheme.typography.titleMedium.copy(
+                    style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold
                     )
                 )

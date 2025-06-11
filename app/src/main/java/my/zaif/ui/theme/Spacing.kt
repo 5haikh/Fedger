@@ -33,6 +33,7 @@ object Spacing {
     val iconSize = 24.dp
     val iconPadding = medium
     val avatarSize = 48.dp
+    val largeAvatarSize = 72.dp
     
     // Text spacing
     val textBlockSpacing = medium

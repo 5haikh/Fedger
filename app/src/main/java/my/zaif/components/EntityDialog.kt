@@ -99,9 +99,8 @@ fun EntityDialog(
                     Text(
                         text = if (entity == null) "Add New Entity" else "Edit Entity",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
-                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        // textAlign = TextAlign.Center, // Defaults to Start
                         modifier = Modifier.fillMaxWidth()
                     )
                     
@@ -133,7 +132,7 @@ fun EntityDialog(
                                 )
                             }
                         },
-                        shape = RoundedCornerShape(Spacing.cardCornerRadius),
+                        shape = RoundedCornerShape(Spacing.dialogCornerRadius),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
@@ -151,7 +150,7 @@ fun EntityDialog(
                         TextButton(
                             onClick = onDismiss,
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(Spacing.cardCornerRadius)
+                            shape = RoundedCornerShape(Spacing.dialogCornerRadius)
                         ) {
                             Text(
                                 text = "Cancel",
@@ -169,7 +168,7 @@ fun EntityDialog(
                                 }
                             },
                             modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(Spacing.cardCornerRadius),
+                            shape = RoundedCornerShape(Spacing.dialogCornerRadius),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary

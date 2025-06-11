@@ -1,6 +1,7 @@
 package my.zaif.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -177,7 +178,7 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { 
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     editingCredential = null
                     showAddCredentialDialog = true 
                 },
@@ -199,7 +200,7 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
                 expanded = true,
                 modifier = Modifier.shadow(
                     elevation = Spacing.elevationMedium,
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(Spacing.large),
                     spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
                 )
             )
@@ -227,8 +228,8 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
                     item {
                         AnimatedVisibility(
                             visible = true,
-                            enter = fadeIn(tween(Spacing.animationDurationMedium)) + 
-                                   slideInVertically(tween(Spacing.animationDurationMedium)) { it / 2 }
+                            enter = fadeIn(tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) +
+                                   slideInVertically(animationSpec = tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) { it / 2 }
                         ) {
                             EntitySummaryCard(
                                 entity = entity!!,
@@ -335,7 +336,7 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
                             ) {
                                 Text(
                                     text = "No credentials added yet.\nTap the + button to add a credential.",
-                                    style = MaterialTheme.typography.bodyLarge,
+                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center
                                 )
@@ -348,8 +349,8 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
                         ) { credential ->
                             AnimatedVisibility(
                                 visible = true,
-                                enter = fadeIn(tween(Spacing.animationDurationMedium)) + 
-                                       slideInVertically(tween(Spacing.animationDurationMedium)) { it / 2 }
+                                enter = fadeIn(tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) +
+                                       slideInVertically(animationSpec = tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) { it / 2 }
                             ) {
                                 StoredCredentialItem(
                                     credential = credential,
@@ -433,7 +434,7 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
                             onClick = {
                                 credentialToDelete?.let { credential ->
                                     viewModel.deleteCredential(credential)
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 }
                                 showDeleteConfirmation = false
                                 credentialToDelete = null
@@ -481,7 +482,7 @@ fun EntitySummaryCard(
             // Avatar circle with first character
             Box(
                 modifier = Modifier
-                    .size(72.dp)
+                    .size(Spacing.largeAvatarSize)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center

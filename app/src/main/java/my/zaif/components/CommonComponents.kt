@@ -110,8 +110,8 @@ fun ContentSurface(
 }
 
 @Composable
-fun VerticalSpacer(height: Int = 16) {
-    Spacer(modifier = Modifier.height(height.dp))
+fun VerticalSpacer(height: androidx.compose.ui.unit.Dp = Spacing.medium) {
+    Spacer(modifier = Modifier.height(height))
 }
 
 @Composable

@@ -27,16 +27,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +50,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,8 +59,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -80,6 +84,8 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.HorizontalDivider
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -119,6 +125,15 @@ fun PersonDetailScreen(
     
     // Format currency
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
+    
+    // LazyList state for scrolling detection
+    val listState = rememberLazyListState()
+
+    val isFabExpanded by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex == 0
+        }
+    }
     
     Scaffold(
         topBar = {
@@ -197,7 +212,7 @@ fun PersonDetailScreen(
                         fontWeight = FontWeight.Medium
                     )
                 },
-                expanded = true,
+                expanded = isFabExpanded,
                 modifier = Modifier.shadow(
                     elevation = Spacing.elevationMedium,
                     shape = RoundedCornerShape(Spacing.large),
@@ -209,15 +224,26 @@ fun PersonDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+                        )
+                    )
+                )
                 .padding(padding)
         ) {
             if (person == null) {
                 // Show loading or error state
-                EmptyStateMessage(message = "Loading person details...")
+                EmptyStateMessage(
+                    message = "Loading person details...",
+                    icon = Icons.Default.HourglassEmpty
+                )
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    state = rememberLazyListState()
+                    state = listState
                 ) {
                     // Person summary card
                     item {
@@ -268,15 +294,27 @@ fun PersonDetailScreen(
                                 enter = fadeIn(tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) +
                                        slideInVertically(animationSpec = tween(durationMillis = Spacing.animationDurationMedium, easing = FastOutSlowInEasing)) { it / 2 }
                             ) {
-                                Text(
-                                    text = "No transactions yet.\nTap the + button to add a transaction.",
-                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                                    textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(Spacing.large)
-                                )
+                                        .padding(Spacing.large),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ReceiptLong,
+                                        contentDescription = "No transactions icon",
+                                        modifier = Modifier.size(Spacing.largeAvatarSize),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                    )
+                                    Spacer(modifier = Modifier.height(Spacing.medium))
+                                    Text(
+                                        text = "No transactions yet.\nTap the + button to add a transaction.",
+                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                                        textAlign = TextAlign.Center,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
                             }
                         }
                     } else {
@@ -401,7 +439,7 @@ fun PersonSummaryCard(
 ) {
     ContentCard(
         modifier = modifier,
-        elevation = 4
+        elevation = 4.dp
     ) {
         Column(
             modifier = Modifier
@@ -457,8 +495,8 @@ fun PersonSummaryCard(
             Spacer(modifier = Modifier.height(Spacing.medium))
             
             val balanceColor = when {
-                balance > 0 -> Color.Green.copy(alpha = 0.8f)
-                balance < 0 -> Color.Red.copy(alpha = 0.8f)
+                balance > 0 -> Color(0xFF008000) // Green
+                balance < 0 -> MaterialTheme.colorScheme.error
                 else -> MaterialTheme.colorScheme.onSurfaceVariant
             }
             
@@ -491,9 +529,10 @@ fun TransactionItem(
     val formattedDate = dateFormatter.format(Date(transaction.date))
     
     val isPositive = transaction.amount > 0
-    val amountColor = if (isPositive) Color.Green.copy(alpha = 0.8f) else Color.Red.copy(alpha = 0.8f)
+    val amountColor = if (isPositive) Color(0xFF008000) else MaterialTheme.colorScheme.error
     val amountText = currencyFormat.format(if (isPositive) transaction.amount else -transaction.amount)
     val transactionType = if (isPositive) "You gave" else "You received"
+    val icon = if (isPositive) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward
     
     ContentCard(
         modifier = modifier
@@ -506,48 +545,64 @@ fun TransactionItem(
                 onClick = { /* No action on click */ },
                 onLongClick = onLongClick
             ),
-        elevation = 2
+        elevation = 2.dp
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(Spacing.cardInnerPadding)
+                .padding(Spacing.cardInnerPadding),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Transaction amount and type
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier
+                    .size(Spacing.avatarSize)
+                    .clip(CircleShape)
+                    .background(amountColor.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = transactionType,
+                    tint = amountColor,
+                    modifier = Modifier.size(Spacing.iconSize)
+                )
+            }
+
+            Spacer(modifier = Modifier.padding(Spacing.small))
+
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = transactionType,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.Medium
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                
-                Text(
-                    text = amountText,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = amountColor,
-                    fontWeight = FontWeight.Bold
-                )
+
+                if (transaction.description.isNotBlank()) {
+                    Text(
+                        text = transaction.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = Spacing.extraSmall)
+                    )
+                }
             }
             
-            // Transaction description
-            Text(
-                text = transaction.description,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(vertical = Spacing.small)
-            )
-            
-            // Transaction date
-            Text(
-                text = formattedDate,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = amountText,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = amountColor
+                )
+                Text(
+                    text = formattedDate,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                )
+            }
         }
     }
 } 

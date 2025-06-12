@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import my.zaif.data.entity.Entity
 import my.zaif.ui.theme.Spacing
+import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -42,7 +43,7 @@ fun EntityItem(
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
-        elevation = 3
+        elevation = 3.dp
     ) {
         Row(
             modifier = Modifier
@@ -77,7 +78,7 @@ fun EntityItem(
                 Text(
                     text = entity.entityName,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

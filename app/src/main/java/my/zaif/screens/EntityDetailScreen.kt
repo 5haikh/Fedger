@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,6 +47,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -112,6 +118,12 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
     
     // LazyList state for scrolling detection
     val listState = rememberLazyListState()
+    
+    val isFabExpanded by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex == 0
+        }
+    }
     
     // Update edited name when entity changes
     if (entity != null && editedName.isEmpty()) {
@@ -197,7 +209,7 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
                         fontWeight = FontWeight.Medium
                     )
                 },
-                expanded = true,
+                expanded = isFabExpanded,
                 modifier = Modifier.shadow(
                     elevation = Spacing.elevationMedium,
                     shape = RoundedCornerShape(Spacing.large),
@@ -209,14 +221,28 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+                        )
+                    )
+                )
                 .padding(padding)
         ) {
             if (entity == null) {
                 // Show loading or error state
                 if (error != null) {
-                    EmptyStateMessage(message = error ?: "Unknown error")
+                    EmptyStateMessage(
+                        message = error ?: "Unknown error",
+                        icon = Icons.Default.Error
+                    )
                 } else {
-                    EmptyStateMessage(message = "Loading entity details...")
+                    EmptyStateMessage(
+                        message = "Loading entity details...",
+                        icon = Icons.Default.HourglassEmpty
+                    )
                 }
             } else {
                 // Show entity details and credentials
@@ -256,7 +282,7 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
                                     ),
                                 shape = MaterialTheme.shapes.medium,
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                                 ),
                                 elevation = CardDefaults.cardElevation(
                                     defaultElevation = Spacing.cardElevation
@@ -334,12 +360,24 @@ fun EntityDetailScreen(entityId: Long, navController: NavController) {
                                     .padding(Spacing.extraLarge),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = "No credentials added yet.\nTap the + button to add a credential.",
-                                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
-                                )
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.VpnKey,
+                                        contentDescription = "No credentials icon",
+                                        modifier = Modifier.size(Spacing.largeAvatarSize),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                    )
+                                    Spacer(modifier = Modifier.height(Spacing.medium))
+                                    Text(
+                                        text = "No credentials added yet.\nTap the + button to add a credential.",
+                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
                         }
                     } else {
@@ -471,7 +509,7 @@ fun EntitySummaryCard(
 ) {
     ContentCard(
         modifier = modifier,
-        elevation = 4
+        elevation = 4.dp
     ) {
         Column(
             modifier = Modifier
@@ -507,20 +545,11 @@ fun EntitySummaryCard(
             )
             
             // Credential count
-            Spacer(modifier = Modifier.height(Spacing.medium))
-            
-            val credentialText = when (credentialCount) {
-                0 -> "No credentials stored"
-                1 -> "1 credential stored"
-                else -> "$credentialCount credentials stored"
-            }
-            
             Text(
-                text = credentialText,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium,
+                text = "$credentialCount credentials",
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
+                modifier = Modifier.padding(top = Spacing.small)
             )
         }
     }

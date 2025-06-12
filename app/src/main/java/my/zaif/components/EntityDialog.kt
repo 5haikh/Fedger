@@ -4,7 +4,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +44,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import my.zaif.data.entity.Entity
 import my.zaif.ui.theme.Spacing
+import androidx.compose.foundation.border
 
 @Composable
 fun EntityDialog(
@@ -67,8 +71,10 @@ fun EntityDialog(
     ) {
         AnimatedVisibility(
             visible = true,
-            enter = fadeIn(spring(stiffness = Spring.StiffnessLow)) + 
-                   scaleIn(spring(stiffness = Spring.StiffnessLow), initialScale = 0.95f)
+            enter = fadeIn(spring(stiffness = Spring.StiffnessLow)) +
+                    slideInVertically(spring(stiffness = Spring.StiffnessMedium)) { it / 2 },
+            exit = fadeOut(spring(stiffness = Spring.StiffnessMedium)) +
+                   slideOutVertically(spring(stiffness = Spring.StiffnessMedium)) { it / 2 }
         ) {
             Card(
                 modifier = Modifier
@@ -76,15 +82,10 @@ fun EntityDialog(
                     .padding(
                         horizontal = Spacing.screenHorizontalPadding, 
                         vertical = Spacing.screenVerticalPadding
-                    )
-                    .shadow(
-                        elevation = Spacing.dialogElevation,
-                        shape = RoundedCornerShape(Spacing.dialogCornerRadius),
-                        spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                     ),
                 shape = RoundedCornerShape(Spacing.dialogCornerRadius),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                 ),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = Spacing.dialogElevation

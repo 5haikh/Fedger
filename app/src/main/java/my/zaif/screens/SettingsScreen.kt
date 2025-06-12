@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -41,6 +42,7 @@ import my.zaif.components.ScreenTitle
 import my.zaif.components.SectionTitle
 import my.zaif.ui.theme.Spacing
 import my.zaif.ui.theme.ThemeManager
+import androidx.compose.foundation.background
 
 @Composable
 fun SettingsScreen() {
@@ -55,6 +57,14 @@ fun SettingsScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+                        )
+                    )
+                )
                 .padding(padding)
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.Top
@@ -204,7 +214,7 @@ fun SettingCard(
                 horizontal = Spacing.screenHorizontalPadding, 
                 vertical = Spacing.screenVerticalPadding
             ),
-        elevation = 2
+        elevation = 2.dp
     ) {
         content()
     }

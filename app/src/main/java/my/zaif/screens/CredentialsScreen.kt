@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Domain
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
@@ -60,6 +63,7 @@ import my.zaif.components.ScreenTitle
 import my.zaif.data.entity.Entity
 import my.zaif.ui.theme.Spacing
 import my.zaif.viewmodel.CredentialsViewModel
+import androidx.compose.foundation.background
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -93,6 +97,12 @@ fun CredentialsScreen(navController: NavController) {
     
     // LazyList state for scrolling detection
     val listState = rememberLazyListState()
+
+    val isFabExpanded by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex == 0
+        }
+    }
     
     Scaffold(
         topBar = {
@@ -120,7 +130,7 @@ fun CredentialsScreen(navController: NavController) {
                         fontWeight = FontWeight.Medium
                     )
                 },
-                expanded = true,
+                expanded = isFabExpanded,
                 modifier = Modifier.shadow(
                     elevation = Spacing.elevationMedium,
                     shape = RoundedCornerShape(Spacing.large),
@@ -132,12 +142,21 @@ fun CredentialsScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+                        )
+                    )
+                )
                 .padding(padding)
         ) {
             if (entities.isEmpty()) {
                 // Show a message when there are no entities
                 EmptyStateMessage(
-                    message = "No entities added yet.\nTap the + button to add an entity."
+                    message = "No entities added yet.\nTap the + button to add an entity.",
+                    icon = Icons.Default.Domain
                 )
             } else {
                 // Show the list of entities

@@ -12,9 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,11 +28,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import my.zaif.ui.theme.Spacing
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.unit.Dp
 
 @Composable
 fun ScreenTitle(
@@ -65,7 +73,8 @@ fun ScreenTitle(
 @Composable
 fun EmptyStateMessage(
     message: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    icon: ImageVector = Icons.Default.Info
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
@@ -73,19 +82,31 @@ fun EmptyStateMessage(
     ) {
         AnimatedVisibility(
             visible = true,
-            enter = fadeIn(tween(Spacing.animationDurationLong)) + 
-                   slideInVertically(tween(Spacing.animationDurationLong)) { it / 2 }
+            enter = fadeIn(tween(Spacing.animationDurationLong)) +
+                    slideInVertically(tween(Spacing.animationDurationLong)) { it / 2 }
         ) {
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    lineHeight = 28.sp,
-                    fontWeight = FontWeight.Medium
-                ),
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(Spacing.extraLarge)
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = "Empty State Icon",
+                    modifier = Modifier.size(Spacing.largeAvatarSize),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                )
+                Spacer(modifier = Modifier.height(Spacing.medium))
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        lineHeight = 28.sp,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = Spacing.extraLarge)
+                )
+            }
         }
     }
 }
@@ -143,21 +164,16 @@ fun SectionTitle(
 fun ContentCard(
     modifier: Modifier = Modifier,
     shape: Shape = MaterialTheme.shapes.medium,
-    elevation: Int = 2,
+    elevation: Dp = 2.dp,
     content: @Composable () -> Unit
 ) {
     Card(
-        modifier = modifier
-            .shadow(
-                elevation = elevation.dp,
-                shape = shape,
-                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-            ),
+        modifier = modifier,
         shape = shape,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = elevation.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = elevation)
     ) {
         content()
     }

@@ -42,6 +42,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -112,6 +114,12 @@ fun LedgerScreen(navController: NavController) {
     // Currency format
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
     
+    val isFabExpanded by remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex == 0
+        }
+    }
+    
     Scaffold(
         topBar = {
             ScreenTitle(title = "Ledger")
@@ -138,7 +146,7 @@ fun LedgerScreen(navController: NavController) {
                         fontWeight = FontWeight.Medium
                     )
                 },
-                expanded = true,
+                expanded = isFabExpanded,
                 modifier = Modifier.shadow(
                     elevation = Spacing.elevationMedium,
                     shape = RoundedCornerShape(Spacing.large),
@@ -150,12 +158,21 @@ fun LedgerScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+                        )
+                    )
+                )
                 .padding(padding)
         ) {
             if (peopleWithBalances.isEmpty()) {
                 // Show a message when there are no people
                 EmptyStateMessage(
-                    message = "No person added yet.\nTap the + button to add someone."
+                    message = "No person added yet.\nTap the + button to add someone.",
+                    icon = Icons.Default.Person
                 )
             } else {
                 // Show the list of people
@@ -292,7 +309,7 @@ fun PersonItem(
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
-        elevation = 3
+        elevation = 3.dp
     ) {
         Row(
             modifier = Modifier
@@ -327,7 +344,7 @@ fun PersonItem(
                 Text(
                     text = person.name,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 
@@ -361,8 +378,8 @@ fun PersonItem(
             } else {
                 // Show balance with appropriate color
                 val balanceColor = when {
-                    balance > 0 -> Color.Green.copy(alpha = 0.8f)
-                    else -> Color.Red.copy(alpha = 0.8f)
+                    balance > 0 -> Color(0xFF008000) // Green
+                    else -> MaterialTheme.colorScheme.error
                 }
                 
                 val balanceText = if (balance > 0) {

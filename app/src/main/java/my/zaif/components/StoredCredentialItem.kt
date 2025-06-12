@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import my.zaif.data.entity.CredentialType
 import my.zaif.data.entity.StoredCredential
 import my.zaif.ui.theme.Spacing
@@ -59,7 +60,7 @@ fun StoredCredentialItem(
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
-        elevation = 3
+        elevation = 3.dp
     ) {
         Row(
             modifier = Modifier
@@ -99,7 +100,7 @@ fun StoredCredentialItem(
                 Text(
                     text = credential.credentialLabel,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -163,14 +164,16 @@ fun StoredCredentialItem(
             }
             
             // Password visibility toggle
-            IconButton(
-                onClick = { passwordVisible = !passwordVisible }
-            ) {
-                Icon(
-                    imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+            if (credential.passwordValue != null) {
+                IconButton(
+                    onClick = { passwordVisible = !passwordVisible }
+                ) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
